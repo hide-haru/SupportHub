@@ -1,0 +1,90 @@
+@charset "utf-8";
+
+/* 背景と中央配置 */
+body {
+    margin: 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* ログインフォーム全体 */
+.login-container {
+    background-color: #ffffff;
+    padding: 40px 50px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    width: 800px;
+    text-align: center;
+}
+
+/* システム名 */
+.login-container h1 {
+    margin-bottom: 30px;
+    font-size: 28px;
+    color: #333333;
+}
+
+/* 入力フィールド */
+.login-container input[type="text"],
+.login-container input[type="password"] {
+    width: 50%;
+    padding: 12px 15px;
+    margin: 10px 0 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.login-container input[type="text"]:focus,
+.login-container input[type="password"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* ログインボタン */
+.login-container button {
+    width: 50%;
+    padding: 12px 0;
+    background-color: #000000;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-container button:hover {
+    background-color: #000000;
+}
+
+/* パスワード忘れリンク */
+.login-container .forgot-password {
+    display: block;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #666;
+    text-decoration: none;
+}
+
+.login-container .forgot-password:hover {
+    color: #000000;
+}
+
+/* 新規登録リンク（右上） */
+.signup-link {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 14px;
+    color: #000000;
+    text-decoration: none;
+}
+
+.signup-link:hover {
+    text-decoration: underline;
+}
