@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid"; //メール認証用トークンとして�
 
 /*
 課題
+１．JWTの発行
 */
 
 export async function POST(request: Request) {

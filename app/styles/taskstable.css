@@ -1,0 +1,29 @@
+@charset "utf-8";
+
+body {
+    background-color: #f0efef;
+}
+.link-container {
+    display: flex;
+    justify-content: flex-end;
+    color: rgb(58, 127, 238);    
+}
+.link-container p {
+    margin: 0px 10px 0px 10px;
+}
+.search-container {
+    margin-bottom: 150px;
+}
+
+.tasks-container {
+    
+    border: solid, 1px, #B9B9B9;
+}
+.class-table {
+    color: rgb(0, 0, 0);
+    border: 3px;
+}
+.class-thead {
+    color: rgb(0, 0, 0);
+    border: 3px;
+}
