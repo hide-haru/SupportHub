@@ -8,8 +8,12 @@ import { Select,SelectTrigger,SelectValue,SelectContent,SelectItem } from "@/com
 import { Button } from "@/components/ui/button";
 import {useReactTable,getCoreRowModel,flexRender,createColumnHelper,} from "@tanstack/react-table";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Tasks() {
+    const router = useRouter();
+
+    const [uniqueid, setuniqueid] = useState<{  }[]>([]);
     const [statasies, setstatasies] = useState<{ status_id: string; status_name: string }[]>([]);
     const [categories, setCategories] = useState<{ category_id: string; category_name: string }[]>([]);
     const [customersies, setcustomersies] = useState<{ customer_id: string; customer_name: string }[]>([]);
@@ -66,13 +70,14 @@ export default function Tasks() {
         fetchFilters();
     }, []);
 
-    //タスク一覧の読み込み（初期）
+    //タスク一覧の読み込み（初回）
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://localhost:3000/api/tasks");
+                const response = await fetch("/api/tasks");
                 const data = await response.json();
                 setTasksData(data);
+                console.log("TaskData:",data);
             } catch (error) {
                 console.error("Fetch error:", error);
             }
@@ -103,18 +108,23 @@ export default function Tasks() {
         getCoreRowModel: getCoreRowModel(),
     });
 
+    //リストWクリック時操作
+    const handleRowDoubleClick = (tasksDetailId: string) => {
+    router.push(`/tasksdetail/${tasksDetailId}`);
+    };
+
   return (
     <>
-      <nav className="flex justify-end gap-2 p-4 text-sm text-gray-600">
-        <Link href="">タスク新規作成</Link>
+      <nav className="flex justify-end gap-2 p-4 text-sm text-blue-500">
+        <Link className="hover:text-black" href="/tasksdetail/new">タスク新規作成</Link>
         <p>／</p>
-        <Link href="">統計</Link>
+        <Link className="hover:text-black" href="">統計</Link>
         <p>／</p>
-        <Link href="">退会</Link>
+        <Link className="hover:text-black" href="">退会</Link>
         <p>／</p>
-        <Link href="">マイページ</Link>
+        <Link className="hover:text-black" href="">マイページ</Link>
         <p>／</p>
-        <Link href="">ログアウト</Link>
+        <Link className="hover:text-black" href="">ログアウト</Link>
       </nav>
 
         <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
@@ -215,7 +225,10 @@ export default function Tasks() {
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  className="cursor-pointer hover:bg-gray-50"
+                  onDoubleClick={() => handleRowDoubleClick(row.original.uniqueid)}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="whitespace-nowrap">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

@@ -5,7 +5,8 @@ export async function GET() {
     try {
         const {data: tasksdata, error: taskserror} = 
             await supabase.from("tasks")
-                .select(`no:no,
+                .select(`uniqueid:uniqueid,
+                    no:no,
                     important:important,
                     status:status_id(status_name),
                     category:category_id(category_name),
@@ -22,6 +23,7 @@ export async function GET() {
 
 
         const flatData = (tasksdata as any[])?.map((task) => ({
+        uniqueid: task.uniqueid,
         no: task.no,
         important: task.important,
         status: Array.isArray(task.status)

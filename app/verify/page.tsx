@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function VerifyPage() {
+  const router = useRouter();
+
   const params = useSearchParams();
   const token = params.get("token");
 
@@ -12,6 +14,7 @@ export default function VerifyPage() {
       fetch(`http://localhost:3000/api/auth/verify?token=${token}`)
         .then(res => res.json())
         .then(data => alert(data.message));
+        router.push("/tasks")
     }
   }, [token]);
 
