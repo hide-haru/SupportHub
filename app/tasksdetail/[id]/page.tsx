@@ -3,12 +3,8 @@
 
 import { useState,useEffect } from "react";
 import { useParams, useRouter } from 'next/navigation';
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { DateTimePicker } from '@/components/ui/datetime-picker';
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select,SelectTrigger,SelectValue,SelectContent,SelectItem } from "@/components/ui/select";
+
 
 
 export default function TasksReferencedetail() {
@@ -34,6 +30,32 @@ export default function TasksReferencedetail() {
 
     const params = useParams();
     const { id } = params;
+
+    const editButton = () => {
+        try {
+            router.push(`/tasksdetail/${id}/edit`)
+        }catch(err){
+            console.log(err);
+            console.log("サーバとの通信に失敗しました。")
+        }
+    }
+
+    const DeleteButton = async () => {
+        try{
+            const response = await fetch(`/api/tasksdetail/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            });
+
+            const resullt = response.json();
+            router.push("/tasks");
+        }catch(err){
+            console.log(err);
+            console.log("サーバとの通信に失敗しました。")
+        }
+    }
 
     useEffect(() => {
         const fetchFilters = async () => {
@@ -147,6 +169,11 @@ export default function TasksReferencedetail() {
                     <p>メール送信先： dummy@gmail.com</p>
                 </div>
             </div>
+            <div>
+                <Button onClick={editButton}>修正</Button>
+                <Button onClick={DeleteButton}>削除</Button>
+            </div>
+            
 
         </>
     );

@@ -1,67 +1,49 @@
 import { supabase } from "@/lib/supabaseClient";
 import { NextResponse } from "next/server";
-import { sendVerificationEmail } from "@/lib/nodemailer";
-import { v4 as uuidv4 } from "uuid"; //メール認証用トークンとして使用
-
-/*
-課題
-１．JWTの発行
-*/
 
 export async function POST(request: Request) {
 
-    try{
+    try {
         const {userName, userId, eMail, password} = await request.json();
 
-        //登録前にユーザIDとメールアドレス重複がないか確認
-        const {count, error: checkError} = await supabase.from("users").select("*", { count: "exact", head: true }).or(`user_id.eq.${userId},e_mail.eq.${eMail}`);
-        console.log(count);
+        /*
+        (一つの処理に任せる)
+        ユーザIDの重複チェック
+        ユーザID out of rangeの対策
+        ユーザIDとメールアドレスチェックの対策
+        */
 
-        if (checkError) {
-            console.error("Supabase error:", checkError);
+        const { data, error } = await supabase.auth.signUp({
+            email: eMail,
+            password: password,
+        });
+
+        if (error) {
+            console.error("サインアップ失敗:", error.message);
+            return NextResponse.json({ message: error.message }, { status: 400 });
+        }
+
+        console.log("サインアップ成功:", data.user)
+
+        const {data:insertData, error:insertError } = await supabase.from("profiles").insert({
+            user_id: userId,
+            user_name: userName,
+            is_deleted: 0,
+            auth_id: data.user?.id,
+        });
+
+        
+        if (insertError) {
+            console.error("Supabase error:", insertError);
             return NextResponse.json(
-                { message: "検索中にエラーが発生しました。" },
+                { message: "データベース登録に失敗しました。" },
                 { status: 500 }
             );
         }
-
-        if (count && count > 0){
-            return NextResponse.json(
-                {message: "同じユーザIDまたはメールアドレスが既に登録されています。"},
-                {status: 400}
-            );
-        }
-
-
-
-        try {
-            //ユーザ登録作業の開始
-            //パスワードのハッシュ化
-            const bcrypt = require("bcrypt");
-            const hashedPassword = await bcrypt.hash(password, 10);
-
-            const verificationToken = uuidv4();
-            console.log(verificationToken);
-            const {data: insertData, error: insertError} = await supabase.from("users").insert({user_name: userName, user_id: userId, e_mail: eMail, hashed_password:hashedPassword, verificationtoken: verificationToken});
-
-            if (insertError) {
-                console.error("Supabase error:", insertError);
-                return NextResponse.json(
-                    { message: "データベース登録に失敗しました。" },
-                    { status: 500 }
-                );
-            }
-
-            await sendVerificationEmail(eMail, verificationToken);
-            return NextResponse.json({message: "新規登録成功。認証メールを送信しました。"});
-            
-        }catch(err){
-            return NextResponse.json({error: "登録失敗"},{status:500});
-        }
-
-
+        
+        return NextResponse.json({message: "新規登録成功。認証メールを送信しました。"});
+        
     }catch(err){
-        console.error(err);
-        return NextResponse.json({message: "サーバ内でエラーが発生しました。"});
+        return NextResponse.json({error: "登録失敗"},{status:500});
     }
 }

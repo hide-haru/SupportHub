@@ -1,4 +1,3 @@
-import Tasks from "@/app/tasks/page";
 import { supabase } from "@/lib/supabaseClient";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
@@ -89,14 +88,39 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
 
 
 
+// ----------------------------------------
 //タスク詳細の更新
-export async function PUT() {
-    
+// ----------------------------------------
+export async function PUT(req: NextRequest, context: { params: Promise<{ id: string }>}) {
+    try{
+        
+    }catch(err){
+        return NextResponse.json({error: "データ削除失敗"},{status:500});
+    }
 }
 
 
 
+// ----------------------------------------
 //タスク詳細の削除
-export async function DELETE() {
-    
+// ----------------------------------------
+export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }>}) {
+    try{
+        const { id } = await context.params;
+        const {data:updateData, error:updateError} = await supabase
+            .from("tasks")
+            .update({
+                is_deleted: 1,
+                deleted_at: new Date().toISOString()
+            })
+            .eq("uniqueid", id)
+
+        if(updateError) {
+            return NextResponse.json({ success: false, updateError});
+        }
+
+        return NextResponse.json({ success: true, updateData });
+    }catch(err){
+        return NextResponse.json({error: "データ削除失敗"},{status:500});
+    }
 }

@@ -1,9 +1,30 @@
 "use strict";
 "use client";
 
-import '../styles/signupform.css';
+import { useEffect, useState } from 'react';
+import '../../styles/signupform.css';
+import { supabase } from '@/lib/supabaseClient';
+
+
 
 export default function Signup() {
+
+    const [userName,setUserName] = useState();
+    const [userId,setUserId] = useState();
+    const [eMail,setEMail] = useState();
+    const [password,setPassword] = useState();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try{
+                const response = await supabase
+                    
+            }catch(err){
+                console.log(err);
+                console.log("サーバとの通信に失敗しました。")
+            }
+        }
+    });
 
     const handleclick = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -31,7 +52,7 @@ export default function Signup() {
     return (
         <>
             <div className='signup-container'>
-                <h1>新規登録</h1>
+                <h1>マイページ</h1>
                 <form onSubmit={handleclick}>
                     <dl>
                         <dt>名前</dt>
@@ -42,7 +63,7 @@ export default function Signup() {
                         <dd><input type="email" name="eMail" placeholder="メールアドレス" required /></dd>
                         <dt>パスワード</dt>
                         <dd><input type="password" name="password" placeholder="パスワード" onInput={(e) => {const target = e.target as HTMLInputElement; target.value = target.value.replace(/[^0-9a-zA-Z]/g, "");}} required /></dd>
-                        <button type="submit">新規登録</button>
+                        <button type="submit">変更する</button>
                     </dl>
                 </form>
             </div>

@@ -1,39 +1,54 @@
 import { supabase } from "@/lib/supabaseClient";
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
-
-/*
-課題
-１．JWTの発行
-*/
 
 export async function POST(request: Request) {
     try{
         const {userId, password} = await request.json();
-        const { data, error } = await supabase.from("users").select("hashed_password").eq("user_id", userId).single()
-        console.log(data);
 
+        //ユーザIDの重複チェック
+        const { data: profileData, error:profileError } = await supabase
+            .from("profiles")
+            .select(`auth_id`)
+            .eq("user_id", userId)
+            .maybeSingle();
+
+        const { data: nondeleteData, error:nondeleteError } = await supabase
+            .from("*")
+            .select(`auth_id`)
+            .eq("is_deleted", 0)
 
         // ユーザーが存在しない場合 or エラーがある場合
-        if (error || !data) {
-            return NextResponse.json(
-                { message: "ユーザーが存在しません。" },
-                { status: 404 }
-            );
-        }
-
-        const hashedpassword = data.hashed_password;
-        console.log(data);
-
-        //ハッシュ化されているパスワードと照合
-        const match = await bcrypt.compare(password, hashedpassword);
-            if (!match) {
+        if (profileError || !profileData) {
+            if (nondeleteError || !nondeleteData) {
                 return NextResponse.json(
-                    { message: "パスワードが違います。" },
-                    { status: 401 }
+                    { message: "ユーザーが存在しません。" },
+                    { status: 404 }
                 );
             }
-        return NextResponse.json({message: "ログインに成功しました。"})
+            
+        }
+
+        const authId = profileData?.auth_id;
+        console.log("authId:",authId)
+
+        const { data: emailData, error: emailError } = await supabase
+            .rpc("get_user_email", { auth_id: authId });
+
+        if (emailError) {
+            console.error("auth.users取得エラー:", emailError);
+            return NextResponse.json({ message: "メール取得に失敗しました" }, { status: 500 });
+        }
+
+        if (!emailData || emailData.length === 0) {
+            console.log("メールが見つかりません");
+            return NextResponse.json({ message: "メールが存在しません" }, { status: 404 });
+        }
+
+        const email = emailData[0].email;
+        console.log("メール:", email);
+
+        return NextResponse.json({ email });
+
     }catch(err){
         console.error(err);
         return NextResponse.json({message: "サーバ内でエラーが発生しました。"})

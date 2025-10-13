@@ -3,6 +3,12 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
     try {
+
+      const { data,error } = await supabase.auth.getSession();
+    //if (!session) return null;
+    console.log("session data:", data);
+
+
         const {data: tasksdata, error: taskserror} = 
             await supabase.from("tasks")
                 .select(`uniqueid:uniqueid,
@@ -19,6 +25,7 @@ export async function GET() {
                     remind_at:remind_at,
                     created_at:created_at,
                     updated_at:updated_at`)
+                .eq("is_deleted", 0)
                 .order('no', { ascending: true }); // 昇順;
 
 

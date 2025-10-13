@@ -59,11 +59,11 @@ export default function TasksNewdetail() {
         const fetchFilters = async () => {
             try {
                 const [customerRes, inquirySourceRes, statusRes, categoryRes, usersRes] = await Promise.all([
-                    fetch("../components/filters/customer_search"),
-                    fetch("../components/filters/inquiry_source_search"),
-                    fetch("../components/filters/Status_search"),
-                    fetch("../components/filters/category_search"),
-                    fetch("../components/filters/users_search"),
+                    fetch("../../components/filters/customer_search"),
+                    fetch("../../components/filters/inquiry_source_search"),
+                    fetch("../../components/filters/Status_search"),
+                    fetch("../../components/filters/category_search"),
+                    fetch("../../components/filters/users_search"),
                     
                 ]);
                 const [customerJson, inquirySourceJson, statusJson, categoryJson, usersResJson] = await Promise.all([

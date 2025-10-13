@@ -3,18 +3,18 @@
 
 import '../styles/loginform.css';
 import Link from "next/link";
-
-/*
-課題
-*/
+import { useRouter } from 'next/navigation';
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Login() {
+
+    const router = useRouter();
 
     const handleclick = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
-        const userId = formData.get("userId");
-        const password = formData.get("password");
+        const userId = formData.get("userId") as string;
+        const password = formData.get("password") as string;
 
         try{
             const response = await fetch("http://localhost:3000/api/auth/login",{
@@ -25,7 +25,31 @@ export default function Login() {
                 body: JSON.stringify({userId: userId, password: password})
             });
             const result = await response.json();
-            console.log(result);
+            const email = result.email;
+
+            //JWTの発行
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password:password.toString(), // 念のため string 化
+            });
+
+            if(error) {
+            console.error("ログイン失敗:", error.message);
+            return null;
+            }
+
+            // JWT と Refresh Token が取得可能
+            const jwt = data.session?.access_token;
+            const refreshToken = data.session?.refresh_token;
+
+
+            
+            localStorage.getItem("accessToken");
+            console.log("保存されたトークン:", localStorage.getItem("accessToken"));
+            
+            // 成功したらフルリロードでTasksへ
+            window.location.href = "/tasks";
+            //router.replace("/tasks?reload=" + Date.now());
         }catch(err){
             console.log("サーバとの通信に失敗しました。再度ログインをお願いします。")
         }

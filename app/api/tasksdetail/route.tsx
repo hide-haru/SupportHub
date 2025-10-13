@@ -1,7 +1,5 @@
-import Tasks from "@/app/tasks/page";
 import { supabase } from "@/lib/supabaseClient";
 import { NextResponse } from "next/server";
-import { NextRequest } from "next/server";
 import { sendTaskNewEmail } from "@/lib/nodemailer";
 
 // ----------------------------------------
@@ -28,6 +26,7 @@ export async function POST(request: Request) {
                 assign_id: data.assignUser,
                 send_mail: data.sendMail,
                 created_at: date,
+                is_deleted: 0
             }])
             .select("uniqueid");
 
