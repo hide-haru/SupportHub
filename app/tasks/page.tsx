@@ -4,19 +4,12 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useReactTable, getCoreRowModel, flexRender, createColumnHelper } from "@tanstack/react-table";
+import { useReactTable, getCoreRowModel, flexRender, createColumnHelper, getSortedRowModel } from "@tanstack/react-table";
 import { supabase } from "@/lib/supabaseClient";
 import { TaskType } from "../components/TasksTable";
 
@@ -27,14 +20,16 @@ export default function Tasks() {
   // 状態管理
   const [session, setSession] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [sorting, setSorting] = useState<any[]>([]);
 
   const [tasksData, setTasksData] = useState<TaskType[] | null>(null);
-  const [authid, setAuthId] = useState<{ authid: string }[] | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [statasies, setStatasies] = useState<{ status_id: string; status_name: string }[] | null>(null);
   const [categories, setCategories] = useState<{ category_id: string; category_name: string }[] | null>(null);
   const [customersies, setCustomersies] = useState<{ customer_id: string; customer_name: string }[] | null>(null);
 
   // フィルター状態
+  const [searchDate, setSearchDate] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [important, setImportant] = useState("");
@@ -44,6 +39,7 @@ export default function Tasks() {
 
   // フィルターリセット
   const resetFilters = () => {
+    setSearchDate("");
     setDateFrom("");
     setDateTo("");
     setImportant("");
@@ -52,32 +48,63 @@ export default function Tasks() {
     setCustomer("");
   };
 
+  //検索条件
+  const searchFilters = async() => {
+    try{
+      const params = new URLSearchParams({
+        searchDate: searchDate || "",
+        dateFrom: dateFrom || "",
+        dateTo: dateTo || "",
+        important: important || "",
+        status: status || "",
+        category: category || "",
+        customer: customer || "",
+      });
+      console.log("bodyData", params);
+      const response = await fetch(`/api/searchfilter?${params.toString()}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
+
+      const result = await response.json();
+       if (result && Array.isArray(result)) {
+        console.log("if",result);
+        setTasksData(result);
+      } else {
+        console.log("else",result);
+        setTasksData([]);
+      }
+
+    }catch(err){
+      console.log(err, "サーバとの通信に失敗しました。再度、タスク一覧から選択をお願いします。")
+    }
+  }
+
   // マスタ取得
   const fetchFilters = async () => {
     try {
-      const [statusRes, categoryRes, customerRes, /*profileRes*/] = await Promise.all([
+      const [statusRes, categoryRes, customerRes] = await Promise.all([
         fetch("../components/filters/Status_search"),
         fetch("../components/filters/category_search"),
         fetch("../components/filters/customer_search"),
-        //fetch("../components/filters/profiles_search"),
       ]);
 
-      const [statusJson, categoryJson, customerJson/*, proflieJson*/] = await Promise.all([
+      const [statusJson, categoryJson, customerJson] = await Promise.all([
         statusRes.json(),
         categoryRes.json(),
         customerRes.json(),
-        //profileRes.json(),
       ]);
 
-      if (statusJson.error || categoryJson.error || customerJson.error /*|| proflieJson.error*/) {
-        console.error("API error:", statusJson.error, categoryJson.error, customerJson.error/*, proflieJson.error*/);
+      if (statusJson.error || categoryJson.error || customerJson.error) {
+        console.error("API error:", statusJson.error, categoryJson.error, customerJson.error);
         return;
       }
 
       setStatasies(statusJson.data);
       setCategories(categoryJson.data);
       setCustomersies(customerJson.data);
-      //setAuthId(proflieJson.data);
     } catch (err) {
       console.error(err);
     }
@@ -98,6 +125,11 @@ export default function Tasks() {
   // 初回ロード・セッション確認
   useEffect(() => {
     const init = async () => {
+
+      const { data: {user}, } = await supabase.auth.getUser();
+      //console.log("aiueo",user?.id ?? null);
+      setUserId(user?.id ?? null);
+
       setIsLoading(true);
       const { data, error } = await supabase.auth.getSession();
 
@@ -147,6 +179,9 @@ export default function Tasks() {
     data: tasksData || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {sorting},
+    onSortingChange: setSorting,
   });
 
   // 行ダブルクリック
@@ -169,13 +204,30 @@ export default function Tasks() {
         <p>／</p>
         <Link className="hover:text-black" href="/deleteuser">退会</Link>
         <p>／</p>
-        <Link className="hover:text-black" href={`/mypage/${authid}`}>マイページ</Link>
+        <Link className="hover:text-black" href={`/mypage/${userId}`}>マイページ</Link>
         <p>／</p>
         <Link className="hover:text-black" href="/logout">ログアウト</Link>
       </nav>
 
       {/* フィルターUI */}
       <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
+
+        {/* 対象日付 */}
+        <div className="flex items-center gap-2">
+          <Label className="text-sm font-medium">対象日付</Label>
+          <Select value={searchDate} onValueChange={setSearchDate}>
+            <SelectTrigger className="w-36 border">
+              <SelectValue placeholder="対象選択" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">入電日時</SelectItem>
+              <SelectItem value="2">対応期日</SelectItem>
+              <SelectItem value="3">作成日時</SelectItem>
+              <SelectItem value="4">更新日時</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* 日付 */}
         <div className="flex items-center gap-2">
           <Label className="text-sm font-medium">期間</Label>
@@ -192,9 +244,9 @@ export default function Tasks() {
               <SelectValue placeholder="すべて" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="high">高</SelectItem>
-              <SelectItem value="mid">中</SelectItem>
-              <SelectItem value="low">低</SelectItem>
+              <SelectItem value="高">高</SelectItem>
+              <SelectItem value="中">中</SelectItem>
+              <SelectItem value="低">低</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -247,7 +299,7 @@ export default function Tasks() {
         {/* ボタン */}
         <div className="ml-auto flex gap-2">
           <Button variant="outline" onClick={resetFilters}>リセット</Button>
-          <Button className="bg-blue-600 text-white">検索</Button>
+          <Button className="bg-blue-600 text-white" onClick={searchFilters}>検索</Button>
         </div>
       </div>
 
@@ -259,8 +311,15 @@ export default function Tasks() {
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                    <TableHead
+                      key={header.id}
+                      className="cursor-pointer select-none"
+                      onClick={header.column.getToggleSortingHandler()}>
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {{
+                          asc: " ▲",
+                          desc: " ▼",
+                        }[header.column.getIsSorted() as string] ?? null}
                     </TableHead>
                   ))}
                 </TableRow>

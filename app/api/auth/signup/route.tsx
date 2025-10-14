@@ -1,10 +1,14 @@
 import { supabase } from "@/lib/supabaseClient";
 import { NextResponse } from "next/server";
 
+
+//------------------------------------
+//サインアップ
+//------------------------------------
 export async function POST(request: Request) {
 
     try {
-        const {userName, userId, eMail, password} = await request.json();
+        const { userName, userId, eMail, password } = await request.json();
 
         /*
         (一つの処理に任せる)

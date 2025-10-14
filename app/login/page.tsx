@@ -58,9 +58,8 @@ export default function Login() {
     return (
         <>
             <div className='login-container'>
-                <Link href="http://localhost:3000/signup">新規登録</Link>
+                <Link href="http://localhost:3000/signup">新規登録はこちら</Link>
                 <h1>SupportHub</h1>
-                <h2>ログイン</h2>
                 <form onSubmit={handleclick}>
                     <dl>
                         <dt>ユーザID</dt>
