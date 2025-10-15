@@ -65,11 +65,13 @@ export default function MyPage() {
                 headers: {
                     "Content-Type": "application/json"
                 },
+                credentials: "include",
                 body: JSON.stringify(bodyData),
             });
             const result = await response.json();
             console.log(result);
-            router.push("/tasks")
+            alert("/tasksへ遷移します。")
+            router.push("/tasks");
 
         }catch(err){
             console.log("サーバとの通信に失敗しました。再度、新規登録をお願いします。")
@@ -89,7 +91,7 @@ export default function MyPage() {
                         <dt>メールアドレス</dt>
                         <dd><input type="email" name="eMail" value={eMail} onChange={(e) => setEMail(e.target.value)} placeholder="メールアドレス" required /></dd>
                         <dt>パスワード</dt>
-                        <dd><input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="パスワード（必須です）" onInput={(e) => {const target = e.target as HTMLInputElement; target.value = target.value.replace(/[^0-9a-zA-Z]/g, "");}} required /></dd>
+                        <dd><input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="パスワード（必須項目）" onInput={(e) => {const target = e.target as HTMLInputElement; target.value = target.value.replace(/[^0-9a-zA-Z]/g, "");}} required /></dd>
                         <button type="submit">変更する</button>
                     </dl>
                 </form>

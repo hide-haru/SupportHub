@@ -10,8 +10,9 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
         const { id } = await context.params;
         console.log("id⇒",id)
         const {data: selectData, error:selectError} = await supabase
+            .rpc('get_task_detail', { p_uniqueid: id });
+            /*
             .from("tasks")
-            //.select("no,customer_id,inquiry_source,call_datetime,important,status_id,category_id,inquiry_title,inquiry_detail,remind_at,assign_id,send_mail")
             .select(`uniqueid:uniqueid,
                     no:no,
                     important:important,
@@ -28,6 +29,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
                     updated_at:updated_at`)
             .eq("uniqueid", id)
             .single()
+            */
 
             console.log(selectData)
 
@@ -38,40 +40,31 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
                 );
             }
 
-            const task = selectData as any;
-
+            const task = selectData[0];
             const flatData = {
                 uniqueid: task.uniqueid,
                 no: task.no,
                 important: task.important,
-                status_id:task.status?.status_id ?? null,
-                status: Array.isArray(task.status)
-                    ? task.status[0]?.status_name ?? null
-                    : task.status?.status_name ?? null,
-                category_id:task.category?.category_id ?? null,
-                category: Array.isArray(task.category)
-                    ? task.category[0]?.category_name ?? null
-                    : task.category?.category_name ?? null,
+                status_id: task.status_id,
+                status: task.status_name,
+                category_id: task.category_id,
+                category: task.category_name,
                 call_datetime: task.call_datetime,
-                customer_id:task.customers?.customer_id ?? null,
-                customers: Array.isArray(task.customers)
-                    ? task.customers[0]?.customer_name ?? null
-                    : task.customers?.customer_name ?? null,
-                inquiry_source_id:task.inquiry_source?.employee_id ?? null,
-                inquiry_source: Array.isArray(task.inquiry_source)
-                    ? task.inquiry_source[0]?.employee_name ?? null
-                    : task.inquiry_source?.employee_name ?? null,
+                customer_id: task.customer_id,
+                customer_name: task.customer_name,
+                inquiry_source_id: task.employee_id,
+                inquiry_source: task.employee_name,
                 inquiry_title: task.inquiry_title,
                 inquiry_detail: task.inquiry_detail,
-                assign_user_id:task.assign_user?.user_id ?? null,
-                assign_user: Array.isArray(task.assign_user)
-                    ? task.assign_user[0]?.user_name ?? null
-                    : task.assign_user?.user_name ?? null,
+                assign_user_id: task.user_id,
+                assign_user: task.user_name,
                 remind_at: task.remind_at,
                 created_at: task.created_at,
                 updated_at: task.updated_at,
+                send_mail: task.send_mail,
+                send_mail_user_name: task.send_mail_user_name
             };
-
+            
             if (selectError) {
                 console.error("Supabase error:", selectError);
                 return NextResponse.json(
@@ -79,6 +72,8 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
                     { status: 500 }
                 );
             }
+
+            console.log(flatData)
 
             return NextResponse.json(flatData)
     }catch(err){

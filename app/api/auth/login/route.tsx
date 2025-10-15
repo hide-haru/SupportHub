@@ -45,7 +45,6 @@ export async function POST(request: Request) {
         }
 
         const email = emailData[0].email;
-        console.log("メール:", email);
 
         return NextResponse.json({ email });
 

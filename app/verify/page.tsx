@@ -3,7 +3,10 @@
 import { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
+
+
 export default function VerifyPage() {
+
   const router = useRouter();
 
   const params = useSearchParams();
@@ -19,4 +22,5 @@ export default function VerifyPage() {
   }, [token]);
 
   return <div>メール認証中…</div>;
+  
 }

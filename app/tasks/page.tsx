@@ -48,7 +48,7 @@ export default function Tasks() {
     setCustomer("");
   };
 
-  //検索条件
+  //タスク取得 & 検索条件
   const searchFilters = async() => {
     try{
       const params = new URLSearchParams({
@@ -60,8 +60,8 @@ export default function Tasks() {
         category: category || "",
         customer: customer || "",
       });
-      console.log("bodyData", params);
-      const response = await fetch(`/api/searchfilter?${params.toString()}`, {
+
+      const response = await fetch(`/api/tasks?${params.toString()}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json"
@@ -110,6 +110,7 @@ export default function Tasks() {
     }
   };
 
+  /*
   // タスク取得
   const fetchData = async () => {
     try {
@@ -121,6 +122,8 @@ export default function Tasks() {
       setTasksData([]);
     }
   };
+  */
+
 
   // 初回ロード・セッション確認
   useEffect(() => {
@@ -139,23 +142,25 @@ export default function Tasks() {
       }
 
       setSession(data.session);
-      await Promise.all([fetchData(), fetchFilters()]);
+      await Promise.all([searchFilters(), fetchFilters()]);
       setIsLoading(false);
     };
     init();
 
+    
     // セッション変更監視
     const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       if (!session) {
         router.replace("/login");
       } else {
-        await Promise.all([fetchData(), fetchFilters()]);
+        await Promise.all([searchFilters(), fetchFilters()]);
       }
     });
 
     return () => listener.subscription.unsubscribe();
-  }, [router]);
+    
+  }, []);
 
   // テーブル定義
   const columnHelper = createColumnHelper<TaskType>();
@@ -231,9 +236,13 @@ export default function Tasks() {
         {/* 日付 */}
         <div className="flex items-center gap-2">
           <Label className="text-sm font-medium">期間</Label>
-          <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-36" />
+          <Input type="date" value={dateFrom} onChange={(e) => {setDateFrom(e.target.value);
+            if (dateTo && dateTo < e.target.value) {
+              setDateTo(e.target.value);
+            }
+          }} className="w-36" />
           <span>〜</span>
-          <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="w-36" />
+          <Input type="date" value={dateTo} min={dateFrom || undefined} onChange={(e) => setDateTo(e.target.value)} className="w-36" />
         </div>
 
         {/* 重要度 */}

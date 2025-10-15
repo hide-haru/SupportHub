@@ -32,7 +32,7 @@ body {
 .login-container input[type="password"] {
     width: 50%;
     padding: 12px 15px;
-    margin: 10px 0 20px 0;
+    margin: 0px 0 20px 0;
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 16px;
@@ -81,10 +81,24 @@ body {
     top: 20px;
     right: 20px;
     font-size: 14px;
-    color: #000000;
+    color: #0078f0;
     text-decoration: none;
 }
 
 .signup-link:hover {
     text-decoration: underline;
+}
+
+
+/* 項目名（dt）を左寄せして、中央基準に配置 */
+.login-container dt {
+    text-align: left;
+    font-weight: bold;
+    margin: 0 auto 0px auto;  /* 中央基準で下に余白 */
+    width: 50%;               /* input と同じ幅でそろえる */
+}
+
+/* 入力欄との間隔 */
+.login-container dd {
+    margin: 0 0 0px 0;      /* 下に余白をとる */
 }

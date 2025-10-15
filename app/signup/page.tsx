@@ -3,15 +3,24 @@
 
 import '../styles/signupform.css';
 
+
+
 export default function Signup() {
 
     const handleclick = async(e: React.FormEvent<HTMLFormElement>) => {
+
         e.preventDefault();
+
         const formData = new FormData(e.currentTarget);
         const userName = formData.get("userName");
-        const userId = formData.get("userId");
+        const userId = Number(formData.get("userId"));
         const eMail = formData.get("eMail");
         const password = formData.get("password");
+
+        if (userId < 1 || userId > 2147483647) {
+            alert("ユーザIDは1〜2147483647の範囲で入力してください");
+            return;
+        }
 
         try{
             const response = await fetch("http://localhost:3000/api/auth/signup",{
@@ -22,9 +31,9 @@ export default function Signup() {
                 body: JSON.stringify({userName: userName, userId: userId, eMail: eMail, password: password})
             });
             const result = await response.json();
-            console.log(result);
+            alert(result.message);
         }catch(err){
-            console.log("サーバとの通信に失敗しました。再度、新規登録をお願いします。")
+            alert("サーバとの通信に失敗しました。再度、新規登録をお願いします。")
         }
     };
 

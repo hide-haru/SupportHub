@@ -27,13 +27,14 @@ body {
     color: #333333;
 }
 
+
 /* 入力フィールド */
 .signup-container input[type="text"],
 .signup-container input[type="email"],
 .signup-container input[type="password"] {
     width: 50%;
     padding: 12px 15px;
-    margin: 10px 0 20px 0;
+    margin: 0px 0 20px 0;
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 16px;
@@ -62,4 +63,17 @@ body {
 
 .signup-container button:hover {
     background-color: #000000;
+}
+
+/* 項目名（dt）を左寄せして、中央基準に配置 */
+.signup-container dt {
+    text-align: left;
+    font-weight: bold;
+    margin: 0 auto 0px auto;  /* 中央基準で下に余白 */
+    width: 50%;               /* input と同じ幅でそろえる */
+}
+
+/* 入力欄との間隔 */
+.signup-container dd {
+    margin: 0 0 20px 0;      /* 下に余白をとる */
 }

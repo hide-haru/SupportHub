@@ -3,12 +3,11 @@
 
 import '../styles/loginform.css';
 import Link from "next/link";
-import { useRouter } from 'next/navigation';
 import { supabase } from "@/lib/supabaseClient";
 
-export default function Login() {
 
-    const router = useRouter();
+
+export default function Login() {
 
     const handleclick = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -30,26 +29,18 @@ export default function Login() {
             //JWTの発行
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
-                password:password.toString(), // 念のため string 化
+                password:password.toString(),
             });
 
             if(error) {
-            console.error("ログイン失敗:", error.message);
-            return null;
+                console.error("ログイン失敗:", error.message);
+                alert("ログインに失敗しました。")
+                return null;
             }
-
-            // JWT と Refresh Token が取得可能
-            const jwt = data.session?.access_token;
-            const refreshToken = data.session?.refresh_token;
-
-
             
-            localStorage.getItem("accessToken");
-            console.log("保存されたトークン:", localStorage.getItem("accessToken"));
-            
+            alert("ログインに成功しました。")
             // 成功したらフルリロードでTasksへ
             window.location.href = "/tasks";
-            //router.replace("/tasks?reload=" + Date.now());
         }catch(err){
             console.log("サーバとの通信に失敗しました。再度ログインをお願いします。")
         }
@@ -58,7 +49,7 @@ export default function Login() {
     return (
         <>
             <div className='login-container'>
-                <Link href="http://localhost:3000/signup">新規登録はこちら</Link>
+                <Link href="http://localhost:3000/signup" className='signup-link'>新規登録はこちら</Link>
                 <h1>SupportHub</h1>
                 <form onSubmit={handleclick}>
                     <dl>
@@ -69,7 +60,7 @@ export default function Login() {
                         <button type="submit">ログイン</button>
                     </dl>
                 </form>
-                <Link href="http://localhost:3000/forgot-password">パスワードを忘れた方はこちら</Link>
+                <Link href="http://localhost:3000/forgot-password" className='forgot-password'>パスワードを忘れた方はこちら</Link>
             </div>
         </>
     );

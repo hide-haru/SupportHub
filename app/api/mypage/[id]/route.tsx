@@ -76,6 +76,8 @@ export async function PUT(request:Request){
              password: password,
         });
 
+        
+
         return NextResponse.json({message: "ユーザ情報の変更に成功しました。"});
     }catch(err){
         return NextResponse.json({error: "登録失敗"},{status:500});

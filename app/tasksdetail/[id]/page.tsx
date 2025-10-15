@@ -4,6 +4,7 @@
 import { useState,useEffect } from "react";
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
+import { Label } from "@radix-ui/react-label";
 
 
 
@@ -42,15 +43,22 @@ export default function TasksReferencedetail() {
 
     const DeleteButton = async () => {
         try{
-            const response = await fetch(`/api/tasksdetail/${id}`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-            });
+            const confirmed = window.confirm('タスクを削除しますか？');
 
-            const resullt = response.json();
-            router.push("/tasks");
+            if(confirmed){
+                const response = await fetch(`/api/tasksdetail/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                });
+
+                const resullt = response.json();
+                router.push("/tasks");  
+            }else{
+                return;
+            }
+            
         }catch(err){
             console.log(err);
             console.log("サーバとの通信に失敗しました。")
@@ -114,67 +122,83 @@ export default function TasksReferencedetail() {
 
     return (
         <>
-            <h1>参照用ページ tasksdetail/[id]</h1>
-            <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
-                <div className="flex items-center gap-2">
-                    <p>No： {no}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <p>作成日時： {createdDate ? createdDate.toLocaleString() : ""}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <p>更新日時： {updatedDate ? updatedDate.toLocaleString() : ""}</p>
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="w-full max-w-7xl h-[800px] bg-white border border-gray-300 rounded-2xl shadow-md p-6 space-y-6">
+                    {/* <h1>タスク参照</h1> */}
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium mr-2">タスクNo</p>
+                            <p className="w-64 h-10 border mr-10 rounded-md flex items-center pl-3"> {no}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium mr-2">作成日時</p>
+                            <p className="w-64 h-10 border mr-10 rounded-md flex items-center pl-3">{createdDate ? createdDate.toLocaleString() : ""}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium mr-2">更新日時</p>
+                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{updatedDate ? updatedDate.toLocaleString() : ""}</p>
+                        </div>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium mr-2">顧客名</p>
+                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{customer?.customer_name}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium mr-2">問合せ元</p>
+                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{inquirySource?.inquiry_source_name}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium mr-2">入電日時</p>
+                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{callDate ? callDate.toLocaleString() : ""}</p>
+                        </div>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium mr-2">重要度</p>
+                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{important}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium mr-2">ステータス</p>
+                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{status?.status_name}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium mr-6">カテゴリ</p>
+                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{category?.category_name}</p>
+                        </div>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium mr-2">問合せ概要</p>
+                            <p className="w-[950px] h-10 border mr-6 rounded-md flex items-center pl-3">{inquiryTitle}</p>
+                        </div>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium mr-2">問合せ詳細</p>
+                            <p className="w-[950px] h-[250px] border mr-6 rounded-md pl-3">{inquiryDetail}</p>
+                        </div>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium mr-2">期日</p>
+                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{remindDate ? remindDate.toLocaleString() : ""}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium mr-2">担当者</p>
+                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{assignUser?.assign_user_name}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium mr-2">メール送信先</p>
+                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">dummy@gmail.com</p>
+                        </div>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6 ml-auto flex gap-2 justify-end">
+                        <Button className="bg-gray-500 text-white w-32" onClick={editButton}>修正</Button>
+                        <Button className="bg-gray-500 text-white w-32" onClick={DeleteButton}>削除</Button>
+                    </div>
                 </div>
             </div>
-            <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
-                <div className="flex items-center gap-2">
-                    <p>顧客名： {customer?.customer_name}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <p>問合せ元： {inquirySource?.inquiry_source_name}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <p>入電時間： {callDate ? callDate.toLocaleString() : ""}</p>
-                </div>
-            </div>
-            <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
-                <div className="flex items-center gap-2">
-                    <p>重要度： {important}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <p>ステータス： {status?.status_name}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <p>カテゴリ： {category?.category_name}</p>
-                </div>
-            </div>
-            <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
-                <div className="flex items-center gap-2">
-                    <p>問合せ概要： {inquiryTitle}</p>
-                </div>
-            </div>
-            <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
-                <div className="flex items-center gap-2">
-                    <p>問合せ詳細： {inquiryDetail}</p>
-                </div>
-            </div>
-            <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
-                <div className="flex items-center gap-2">
-                    <p>期日： {remindDate ? remindDate.toLocaleString() : ""}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <p>担当者： {assignUser?.assign_user_name}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <p>メール送信先： dummy@gmail.com</p>
-                </div>
-            </div>
-            <div>
-                <Button onClick={editButton}>修正</Button>
-                <Button onClick={DeleteButton}>削除</Button>
-            </div>
-            
-
         </>
     );
 }

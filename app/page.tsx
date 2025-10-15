@@ -1,17 +1,29 @@
 "use strict";
 "use client";
 
-/*
-１．ルートページ：JWT発行状況に応じてアクセスページを変更する処理を行う。
-２．マスタ管理画面作る
-*/
+import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
+
+
 
 export default function Home() {
-  return (
-    <>
-      <div>
-        <h1>システム名：SupportHub</h1>
-      </div>
-    </>
-  );
+
+  const router = useRouter();
+
+  const init = async () => {
+
+    const { data, error } = await supabase.auth.getSession();
+     console.log("data",data);
+
+    if (error || !data.session) {
+      router.replace("/login"); //セッションの取得が出来なかった場合
+      return;
+    }else{
+      router.replace("/tasks"); //セッションの取得が出来た場合
+    }
+
+  }
+
+  init();
+  
 }
