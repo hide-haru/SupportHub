@@ -11,3 +11,5 @@ export async function GET() {
 
     return NextResponse.json({data});
 }
+
+//v0フォークの確認（2025.10.16）
