@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
+import { sendTaskNewEmail } from "@/lib/nodemailer";
 
 // ----------------------------------------
 //タスク詳細の取得
@@ -11,25 +12,6 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
         console.log("id⇒",id)
         const {data: selectData, error:selectError} = await supabase
             .rpc('get_task_detail', { p_uniqueid: id });
-            /*
-            .from("tasks")
-            .select(`uniqueid:uniqueid,
-                    no:no,
-                    important:important,
-                    status:status_id(status_id,status_name),
-                    category:category_id(category_id,category_name),
-                    call_datetime:call_datetime,
-                    customers:customer_id(customer_id,customer_name),
-                    inquiry_source:inquiry_source(employee_id,employee_name),
-                    inquiry_title:inquiry_title,
-                    inquiry_detail:inquiry_detail,
-                    assign_user:assign_id(user_id,user_name),
-                    remind_at:remind_at,
-                    created_at:created_at,
-                    updated_at:updated_at`)
-            .eq("uniqueid", id)
-            .single()
-            */
 
             console.log(selectData)
 
@@ -68,7 +50,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
             if (selectError) {
                 console.error("Supabase error:", selectError);
                 return NextResponse.json(
-                    { message: "データベース登録に失敗しました。" },
+                    { message: "データ取得成功" },
                     { status: 500 }
                 );
             }
@@ -88,9 +70,47 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
 // ----------------------------------------
 export async function PUT(req: NextRequest, context: { params: Promise<{ id: string }>}) {
     try{
-        
+            const data = await req.json();
+            console.log(data);
+            
+            /*
+            const {data: insertData, error: insertError} = await supabase
+                .from("tasks")
+                .update([{
+                    customer_id: data.customer,
+                    inquiry_source: data.inquirySource,
+                    call_datetime: data.callDate,
+                    important: data.important,
+                    status_id: data.status,
+                    category_id: data.category,
+                    inquiry_title: data.inquiryTitle,
+                    inquiry_detail: data.inquiryDetail,
+                    remind_at: data.remindDate,
+                    assign_id: data.assignUser,
+                    send_mail: data.sendMail,
+                    updated_at: new Date().toISOString(),
+                    is_deleted: 0
+                }])
+                .select("*");
+    
+                if (insertError) {
+                    console.error("Supabase error:", insertError);
+                    return NextResponse.json(
+                        { message: "データベース登録に失敗しました。" },
+                        { status: 500 }
+                    );
+                }
+            
+            console.log(data);
+    
+            // 登録されたUUIDを取得
+            const insertedId = insertData?.[0]?.uniqueid;
+            console.log("登録されたUUID:", insertedId);
+            await sendTaskNewEmail(data.sendMail, insertedId, data.inquiryTitle, data.inquiryDetail);
+            return NextResponse.json({message: "データ修正成功"})
+            */
     }catch(err){
-        return NextResponse.json({error: "データ削除失敗"},{status:500});
+        return NextResponse.json({error: "データ修正失敗"},{status:500});
     }
 }
 

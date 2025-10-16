@@ -26,8 +26,7 @@ export default function TasksReferencedetail() {
     const [inquiryDetail,setInquiryDetail] = useState("");
     const [remindDate, setRemindDate ] = useState<Date | undefined>()
     const [status, setStatus] = useState<{ status_id: string; status_name: string } | null>(null);
-
-    //const [sendMail, setSendMail] = useState("");
+    const [sendMail, setSendMail] = useState<{send_mail_user_name: string} | null>(null);
 
     const params = useParams();
     const { id } = params;
@@ -67,34 +66,35 @@ export default function TasksReferencedetail() {
 
     useEffect(() => {
         const fetchFilters = async () => {
-             try{            
-            const response = await fetch(`http://localhost:3000/api/tasksdetail/${id}`,{
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-            });
-            const result = await response.json();
-            setUniqueId(result.uniqueid);
-            setNo(result.no);
-            setAssignUser({assign_user_id:result.assign_user_id, assign_user_name:result.assign_user});
-            setCustomer({customer_id:result.customer_id, customer_name:result.customers});
-            setinquirySource({inquiry_source_id:result.inquiry_source_id, inquiry_source_name:result.inquiry_source});
-            setcallDate(result.call_datetime);
-            setCategory({category_id:result.category, category_name:result.category});
-            setcreatedDate(result.created_at);
-            setupdatedDate(result.updated_at);
-            setImportant(result.important);
-            setInquiryTitle(result.inquiry_title);
-            setInquiryDetail(result.inquiry_detail);
-            setRemindDate(result.remind_at);
-            setStatus({status_id:result.status_id, status_name:result.status});
-            
-            console.log(result);
-        }catch(err){
-            console.log(err);
-            console.log("サーバとの通信に失敗しました。再度、タスク一覧から選択をお願いします。")
-        }
+            try{            
+                const response = await fetch(`http://localhost:3000/api/tasksdetail/${id}`,{
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                });
+                const result = await response.json();
+                console.log(result);
+                setUniqueId(result.uniqueid);
+                setNo(result.no);
+                setAssignUser({assign_user_id:result.assign_user_id, assign_user_name:result.assign_user});
+                setCustomer({customer_id:result.customer_id, customer_name:result.customers});
+                setinquirySource({inquiry_source_id:result.inquiry_source_id, inquiry_source_name:result.inquiry_source});
+                setcallDate(result.call_datetime);
+                setCategory({category_id:result.category, category_name:result.category});
+                setcreatedDate(result.created_at);
+                setupdatedDate(result.updated_at);
+                setImportant(result.important);
+                setInquiryTitle(result.inquiry_title);
+                setInquiryDetail(result.inquiry_detail);
+                setRemindDate(result.remind_at);
+                setStatus({status_id:result.status_id, status_name:result.status});
+                setSendMail({send_mail_user_name:result.send_mail_user_name})
+                
+            }catch(err){
+                console.log(err);
+                alert("サーバとの通信に失敗しました。再度、タスク一覧から選択をお願いします。")
+            }
         };
         if (id) fetchFilters();
     }, [id]);
@@ -115,6 +115,7 @@ export default function TasksReferencedetail() {
             console.log("問合せ詳細", inquiryDetail);
             console.log("期日", remindDate);
             console.log("ステータス", status?.status_id, status?.status_name);
+            console.log("メール送信先", sendMail?.send_mail_user_name)
         }
     }, [customer]);
     
@@ -190,7 +191,7 @@ export default function TasksReferencedetail() {
                         </div>
                         <div className="flex items-center gap-2">
                             <p className="text-sm font-medium mr-2">メール送信先</p>
-                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">dummy@gmail.com</p>
+                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{sendMail?.send_mail_user_name}</p>
                         </div>
                     </div>
                     <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6 ml-auto flex gap-2 justify-end">

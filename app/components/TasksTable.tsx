@@ -12,5 +12,5 @@ export type TaskType = {
     remind_at: string;
     created_at: string;
     updated_at: string;
-    inquiry_source: string
+    inquiry_source: string;
 };
