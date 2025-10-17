@@ -5,8 +5,7 @@ import { useState,useEffect } from "react";
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Label } from "@radix-ui/react-label";
-
-
+import Comments from "../../components/Comments";
 
 export default function TasksReferencedetail() {
 
@@ -199,6 +198,10 @@ export default function TasksReferencedetail() {
                         <Button className="bg-gray-500 text-white w-32" onClick={DeleteButton}>削除</Button>
                     </div>
                 </div>
+            </div>
+            <div>
+                {/* 💬 コメント機能をここに表示 */}
+                <Comments postId={uniquId} />
             </div>
         </>
     );
