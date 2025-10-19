@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
     try{
+        console.log("ログインチェックの開始")
         const {userId, password} = await request.json();
 
         //ユーザIDの重複チェック
@@ -11,22 +12,29 @@ export async function POST(request: Request) {
             .select(`auth_id`)
             .eq("user_id", userId)
             .maybeSingle();
-
-        const { data: nondeleteData, error:nondeleteError } = await supabase
-            .from("*")
-            .select(`auth_id`)
-            .eq("is_deleted", 0)
-
-        // ユーザーが存在しない場合 or エラーがある場合
         if (profileError || !profileData) {
-            if (nondeleteError || !nondeleteData) {
-                return NextResponse.json(
-                    { message: "ユーザーが存在しません。" },
-                    { status: 404 }
-                );
-            }
-            
+            return NextResponse.json(
+                { message: "ユーザIDまたはパスワードが違います。" },
+                { status: 404 }
+            );
         }
+        console.log("ユーザIDの重複チェックを抜けました。", profileData)
+
+        //削除済みユーザのチェック
+        const { data: nondeleteData, error:nondeleteError } = await supabase
+            .from("profiles")
+            .select(`auth_id`)
+            .eq("user_id", userId)
+            .eq("is_deleted", 0)
+            .maybeSingle();
+        // ユーザーが存在しない場合 or エラーがある場合
+        if (nondeleteError || !nondeleteData) {
+            return NextResponse.json(
+                { message: "削除済みのユーザです。" },
+                { status: 404 }
+            );
+        }
+        console.log("削除済みユーザの重複チェックを抜けました。", nondeleteData)
 
         const authId = profileData?.auth_id;
         console.log("authId:",authId)

@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function fetchUsers() {
     const {data, error} = await supabase.rpc("users_search");
 
     if (error) {

@@ -9,7 +9,11 @@ import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select,SelectTrigger,SelectValue,SelectContent,SelectItem } from "@/components/ui/select";
-import { getDefaultClassNames } from "react-day-picker";
+import { fetchCategory } from "@/lib/db/category";
+import { fetchCutomers } from "@/lib/db/customer";
+import { fetchInquirySource } from "@/lib/db/inquirySource";
+import { fetchStatus } from "@/lib/db/status";
+import { fetchUsers } from "@/lib/db/users";
 
 
 
@@ -42,48 +46,16 @@ export default function TasksNewdetail() {
     const params = useParams();
         const { id } = params;
 
-    /*
-    const editCreate = async() => {
-
-        //requiredチェック
-        if(!customer || !status || !category || !inquiryTitle || !inquiryDetail){
-            alert("必須項目が入力されていません。")
-            return;
-        }
-
-        try{            
-            const response = await fetch("http://localhost:3000/api/tasksdetail",{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({customer: customer, inquirySource: inquirySource, callDate: callDate,
-                                        important: important, status: status, category:category, inquiryTitle: inquiryTitle,
-                                        inquiryDetail: inquiryDetail, remindDate: remindDate, assignUser: assignUser, sendMail: sendMail
-                })
-            });
-            const result = await response.json();
-            console.log(result);
-            router.push('/tasks');
-        }catch(err){
-            console.log("bbb")
-            console.log(err);
-            console.log("サーバとの通信に失敗しました。再度、新規登録をお願いします。")
-        }
-    }
-    */
-
     //マスタ類API（Status / Category / Customers）の呼び出し
     useEffect(() => {
         const fetchMasters = async () => {
             try {
                 const [customerRes, inquirySourceRes, statusRes, categoryRes, usersRes] = await Promise.all([
-                    fetch("../../components/filters/customer_search"),
-                    fetch("../../components/filters/inquiry_source_search"),
-                    fetch("../../components/filters/Status_search"),
-                    fetch("../../components/filters/category_search"),
-                    fetch("../../components/filters/users_search"),
-                    
+                    fetchCutomers(),
+                    fetchInquirySource(),
+                    fetchStatus(),
+                    fetchCategory(),
+                    fetchUsers(),
                 ]);
                 const [customerJson, inquirySourceJson, statusJson, categoryJson, usersResJson] = await Promise.all([
                     customerRes.json(),

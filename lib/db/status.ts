@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function fetchStatus() {
     const {data, error} = await supabase.from ("status").select("status_id, status_name");
 
     if (error) {

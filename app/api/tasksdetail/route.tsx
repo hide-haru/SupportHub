@@ -8,14 +8,14 @@ import { sendTaskNewEmail } from "@/lib/nodemailer";
 export async function POST(request: Request) {
     try{
         const data = await request.json();
-
-        const date = new Date();
+        const normalizeInt = (value: string | number | null | undefined) =>
+            value === "" || value === undefined ? null : Number(value);
         
         const {data: insertData, error: insertError} = await supabase
             .from("tasks")
             .insert([{
                 customer_id: data.customer,
-                inquiry_source: data.inquirySource,
+                inquiry_source: normalizeInt(data.inquirySource),
                 call_datetime: data.callDate,
                 important: data.important,
                 status_id: data.status,
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
                 remind_at: data.remindDate,
                 assign_id: data.assignUser,
                 send_mail: data.sendMail,
-                created_at: date,
+                created_at: new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }),
                 is_deleted: 0
             }])
             .select("uniqueid");
@@ -43,7 +43,11 @@ export async function POST(request: Request) {
         // 登録されたUUIDを取得
         const insertedId = insertData?.[0]?.uniqueid;
         console.log("登録されたUUID:", insertedId);
-        await sendTaskNewEmail(data.sendMail, insertedId, data.inquiryTitle, data.inquiryDetail);
+
+        if(data.sendMail){
+            await sendTaskNewEmail(data.sendMail, insertedId, data.inquiryTitle, data.inquiryDetail);
+        }
+        
         return NextResponse.json({message: "登録成功"})
     }catch(err){
         return NextResponse.json({error: "登録失敗"},{status:500});

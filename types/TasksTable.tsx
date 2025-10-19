@@ -6,7 +6,9 @@ export type TaskType = {
     category: number;
     call_datetime: string;
     customers: string;
+    customers_employee:string;
     inquiry_title: string;
+    inquiry_detail: string;
     detail_display: string;
     assign_user: number;
     remind_at: string;

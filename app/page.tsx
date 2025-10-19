@@ -7,21 +7,20 @@ import { useRouter } from "next/navigation";
 
 
 export default function Home() {
-
   const router = useRouter();
 
   const init = async () => {
-
     const { data, error } = await supabase.auth.getSession();
-     console.log("data",data);
-
+    
+    //==================================================
+    //セッション有無の処理
+    //==================================================
     if (error || !data.session) {
-      router.replace("/login"); //セッションの取得が出来なかった場合
+      router.replace("/login");
       return;
     }else{
-      router.replace("/tasks"); //セッションの取得が出来た場合
+      router.replace("/tasks");
     }
-
   }
 
   init();

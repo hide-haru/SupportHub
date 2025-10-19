@@ -3,6 +3,7 @@
 
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { Button } from "@/components/ui/button";
 
 export default function DeleteAccountButton() {
   const router = useRouter();
@@ -45,7 +46,18 @@ export default function DeleteAccountButton() {
       alert("エラー: " + data.error);
     }
   };
- 
 
-  return <button onClick={handleDelete} className="btn btn-danger">退会する</button>;
+
+  return(
+    <>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <h1>退会しますか？</h1>
+        <div className="flex gap-4">
+          <Button onClick={handleDelete} className="bg-blue-600 text-white w-24">はい</Button>
+          <Button onClick={() => router.back()} className="bg-blue-600 text-white w-24">いいえ</Button>
+        </div>
+      </div>
+    </>
+  );
+   
 }

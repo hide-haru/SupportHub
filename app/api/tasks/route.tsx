@@ -14,7 +14,7 @@ export async function GET(request: Request) {
         const status = searchParams.get("status");
         const category = searchParams.get("category");
         const customer = searchParams.get("customer");
-        console.log("受け取った検索条件:", { searchDate,dateFrom, dateTo, important, status, category, customer });
+        //console.log("受け取った検索条件:", { searchDate,dateFrom, dateTo, important, status, category, customer });
 
         // 日付対象カラム
         if (searchDate === "1") targetDate = ["call_datetime"];
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
         else if (searchDate === "3") targetDate = ["created_at"];
         else if (searchDate === "4") targetDate = ["updated_at"];
         else if (searchDate === "") targetDate = ["call_datetime", "remind_at", "created_at", "updated_at"];
-        console.log("検索対象日付カラム:", targetDate);
+        //console.log("検索対象日付カラム:", targetDate);
 
         //DB検索
         let query = supabase.from("tasks")
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
                     customers:customer_id(customer_name),
                     inquiry_source:inquiry_source(employee_name),
                     inquiry_title:inquiry_title,
-                    detail_display:detail_display,
+                    inquiry_detail:inquiry_detail,
                     assign_user:assign_id(user_name),
                     remind_at:remind_at,
                     created_at:created_at,
@@ -59,7 +59,7 @@ export async function GET(request: Request) {
             }
         }
 
-        console.log(query);
+        //console.log(query);
         const { data: selectData, error: selectError } = await query;
         
 
@@ -82,7 +82,7 @@ export async function GET(request: Request) {
             ? task.customers[0]?.customer_name ?? null
             : task.customers?.customer_name ?? null,
             inquiry_title: task.inquiry_title,
-            detail_display: task.detail_display,
+            inquiry_detail: task.inquiry_detail,
             inquiry_source: Array.isArray(task.inquiry_source)
             ? task.inquiry_source[0]?.employee_name ?? null
             : task.inquiry_source?.employee_name ?? null,

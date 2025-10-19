@@ -17,10 +17,10 @@ export default function VerifyPage() {
       fetch(`http://localhost:3000/api/auth/verify?token=${token}`)
         .then(res => res.json())
         .then(data => alert(data.message));
-        router.push("/tasks")
+        window.location.href = "/tasks";
     }
   }, [token]);
 
-  return <div>メール認証中…</div>;
+  return <div className="flex items-center justify-center min-h-screen">メール認証中…</div>;
   
 }

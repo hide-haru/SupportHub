@@ -1,8 +1,8 @@
 import { supabase } from "@/lib/supabaseClient";
 import { NextResponse } from "next/server";
 
-export async function GET() {
-    const {data, error} = await supabase.from ("customers").select("customer_id, customer_name");
+export async function fetchProfile() {
+    const {data, error} = await supabase.from ("profiles").select("auth_id");
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 })
