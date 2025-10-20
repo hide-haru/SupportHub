@@ -41,35 +41,52 @@ export default function TasksNewdetail() {
     const [inquiryDetail,setInquiryDetail] = useState("");
     const [remindDate, setRemindDate] = useState<Date | undefined>();
     const [assignUser, setAssignUser] = useState<{ assign_user_id: string; assign_user_name: string } | null>(null);
-    const [sendMail, setSendMail] = useState("");
+    const [sendMail, setSendMail] = useState<{ send_mail: string; send_mail_user_name: string } | null>(null);
 
     const params = useParams();
         const { id } = params;
+
+
+    const newCreate = async () => {
+        const bodyData = {
+        customer,
+        inquirySource,
+        callDate: callDate ? callDate.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo",year: "numeric",month: "2-digit",day: "2-digit",hour: "2-digit",minute: "2-digit",hour12: false, }) : null,
+        important,
+        status,
+        category,
+        inquiryTitle,
+        inquiryDetail,
+        remindDate: remindDate ? remindDate.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo",year: "numeric",month: "2-digit",day: "2-digit",hour: "2-digit",minute: "2-digit",hour12: false, }) : null,
+        assignUser,
+        sendMail,
+            };
+        console.log(bodyData);
+    }
 
     //マスタ類API（Status / Category / Customers）の呼び出し
     useEffect(() => {
         const fetchMasters = async () => {
             try {
-                const [customerRes, inquirySourceRes, statusRes, categoryRes, usersRes] = await Promise.all([
+                const customerId = customer ? customer.customer_id : null;
+                const inquirySourceRes = customerId ? await fetchInquirySource(customerId) : { json: async () => ({ data: [] }) };
+                const [customerRes, statusRes, categoryRes, usersRes] = await Promise.all([
                     fetchCutomers(),
-                    fetchInquirySource(),
                     fetchStatus(),
                     fetchCategory(),
                     fetchUsers(),
                 ]);
-                const [customerJson, inquirySourceJson, statusJson, categoryJson, usersResJson] = await Promise.all([
+                const [customerJson, statusJson, categoryJson, usersResJson] = await Promise.all([
                     customerRes.json(),
-                    inquirySourceRes.json(),
                     statusRes.json(),
                     categoryRes.json(),
                     usersRes.json(),
                 ]);
-                if (customerJson.error || inquirySourceJson.error || statusJson.error || categoryJson.error || usersResJson.error) {
-                    console.error("API error:", customerJson.error, inquirySourceJson.error, statusJson.error, categoryJson.error, usersResJson.error);
+                if (customerJson.error || statusJson.error || categoryJson.error || usersResJson.error) {
+                    console.error("API error:", customerJson.error, statusJson.error, categoryJson.error, usersResJson.error);
                     return;
                 }
                 setcustomersies(customerJson.data);
-                setinquirySources(inquirySourceJson.data);
                 setstatasies(statusJson.data);
                 setCategories(categoryJson.data);
                 setUsers(usersResJson.data);
@@ -79,6 +96,26 @@ export default function TasksNewdetail() {
         };
         fetchMasters();
     }, []);
+
+    //顧客マスタが選択された時に、付随した従業員のみを表示する
+    useEffect(() => {
+        const fetchInquirySourceAPI = async () => {
+        if (!customer) {
+            setinquirySources([]);
+            return;
+        }
+
+        try {
+            const inquirySourceRes = await fetchInquirySource(customer.customer_id);
+            const inquirySourceJson = await inquirySourceRes.json();
+            setinquirySources(inquirySourceJson.data);
+        } catch (err) {
+            console.error(err);
+        }
+        };
+                
+        fetchInquirySourceAPI();
+    }, [customer]);
     
 
     useEffect(() => {
@@ -99,15 +136,15 @@ export default function TasksNewdetail() {
                 setCustomer({customer_id:result.customer_id, customer_name:result.customers});
                 setinquirySource({inquiry_source_id:result.inquiry_source_id, inquiry_source_name:result.inquiry_source});
                 setcallDate(result.call_datetime ? new Date(result.call_datetime) : undefined);
-                setCategory({category_id:result.category, category_name:result.category});
-                setcreatedDate(result.created_at);
-                setupdatedDate(result.updated_at);
+                setCategory({category_id:result.category_id, category_name:result.category});
+                setcreatedDate(result.created_at ? new Date(result.created_at) : undefined);
+                setupdatedDate(result.created_at ? new Date(result.updated_at) : undefined);
                 setImportant(result.important);
                 setInquiryTitle(result.inquiry_title);
                 setInquiryDetail(result.inquiry_detail);
-                setRemindDate(result.remind_at);
+                setRemindDate(result.remind_at ? new Date(result.remind_at) : undefined);
                 setStatus({status_id:result.status_id, status_name:result.status});
-                //setSendMail({send_mail_user_name:result.send_mail_user_name})
+                setSendMail({ send_mail:result.send_mail, send_mail_user_name:result.send_mail_user_name })
                 
             }catch(err){
                 console.log(err);
@@ -127,13 +164,8 @@ export default function TasksNewdetail() {
                         {/* 顧客名 */}
                         <div className="flex items-center gap-2">
                             <Label className="text-sm font-medium mr-2">顧客名</Label>
-                            <Select
-  value={customer?.customer_id}
-  onValueChange={(value) => {
-    const selected = customersies.find((c) => c.customer_id === value) || null;
-    setCustomer(selected);
-  }}
->
+                            <Select value={customer?.customer_id} onValueChange={(value) => { const selected = customersies.find((c) => c.customer_id === value) || null;
+                                setCustomer(selected);}}>
                             <SelectTrigger className="w-64 border mr-6">
                                 <SelectValue placeholder={customer?.customer_name} />
                             </SelectTrigger>
@@ -150,9 +182,8 @@ export default function TasksNewdetail() {
                         {/* 問合せ元 */}
                         <div className="flex items-center gap-2">
                             <Label className="text-sm font-medium mr-2">問合せ元</Label>
-                            <Select value={inquirySource?.inquiry_source_id} onValueChange={(value) => {
-    const selected = inquirySources.find((s) => s.employee_id === value) || null;
-  }}>
+                            <Select value={inquirySource?.inquiry_source_id} onValueChange={(value) => { const selected = inquirySources.find((s) => s.employee_id === value) || null;
+                                setinquirySource(selected? { inquiry_source_id: selected.employee_id, inquiry_source_name: selected.employee_name, }: null );}}>
                             <SelectTrigger className="w-64 border mr-6">
                                 <SelectValue placeholder="問合せ元" />
                             </SelectTrigger>
@@ -191,10 +222,8 @@ export default function TasksNewdetail() {
                         {/* ステータス */}
                         <div className="flex items-center gap-2">
                             <Label className="text-sm font-medium mr-2">ステータス</Label>
-                            <Select value={status?.status_id} onValueChange={(value) => {
-    const selected = statasies.find((s) => s.status_id === value) || null;
-    setStatus(selected);
-  }}>
+                            <Select value={status?.status_id} onValueChange={(value) => { const selected = statasies.find((s) => s.status_id === value) || null;
+                                setStatus(selected);}}>
                             <SelectTrigger className="w-64 border mr-6">
                                 <SelectValue placeholder="ステータス ※必須項目※" />
                             </SelectTrigger>
@@ -210,10 +239,8 @@ export default function TasksNewdetail() {
                         {/* カテゴリ */}
                         <div className="flex items-center gap-2">
                             <Label className="text-sm font-medium mr-5">カテゴリ</Label>
-                            <Select value={category?.category_id} onValueChange={(value) => {
-    const selected = categories.find((ca) => ca.category_id === value) || null;
-    setCategory(selected);
-  }}>
+                            <Select value={category?.category_id} onValueChange={(value) => { const selected = categories.find((ca) => ca.category_id === value) || null;
+                                setCategory(selected);}}>
                             <SelectTrigger className="w-64 border">
                                 <SelectValue placeholder="カテゴリ ※必須項目※" />
                             </SelectTrigger>
@@ -253,14 +280,8 @@ export default function TasksNewdetail() {
                         {/* 担当者 */}
                         <div className="flex items-center gap-2 mr-6">
                             <Label className="text-sm font-medium mr-2">担当者</Label>
-                            <Select value={assignUser?.assign_user_id} onValueChange={(value) => {
-      const selected = users.find((u) => u.user_id === value);
-      setAssignUser(
-        selected
-          ? { assign_user_id: selected.user_id, assign_user_name: selected.user_name }
-          : null
-      );
-    }}>
+                            <Select value={assignUser?.assign_user_id} onValueChange={(value) => { const selected = users.find((u) => u.user_id === value);
+                                setAssignUser(selected? { assign_user_id: selected.user_id, assign_user_name: selected.user_name }: null);}}>
                             <SelectTrigger className="w-64 border">
                                 <SelectValue placeholder="すべて" />
                             </SelectTrigger>
@@ -275,26 +296,27 @@ export default function TasksNewdetail() {
                         </div>
                         {/* メール送信先 */}
                         <div className="flex items-center gap-2">
-                            <Label className="text-sm font-medium mr-2">メール送信先</Label>
-                            <Select value={sendMail} onValueChange={(value) => setSendMail(value)}>
+                        <Label className="text-sm font-medium mr-2">メール送信先</Label>
+                        <Select value={sendMail?.send_mail || ""} onValueChange={(value) => { const selected = users.find((u) => u.e_mail === value);
+                            setSendMail(selected? { send_mail: selected.e_mail, send_mail_user_name: selected.user_name }: null);}}>
                             <SelectTrigger className="w-64 border">
-                                <SelectValue placeholder="すべて" />
+                            <SelectValue placeholder="すべて" />
                             </SelectTrigger>
                             <SelectContent className="w-64">
-                                {users.map((option) => (
-                                    <SelectItem key={option.e_mail} value={option.e_mail}>
-                                        {option.user_name}
-                                    </SelectItem>
-                                ))}
+                            {users.map((option) => (
+                                <SelectItem key={option.e_mail} value={option.e_mail}>
+                                {option.user_name}
+                                </SelectItem>
+                            ))}
                             </SelectContent>
-                            </Select>
+                        </Select>
                         </div>
                     </div>
 
                     <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
                         {/* ボタン類 */}
                         <div className="ml-auto flex gap-2">
-                            <Button className="bg-gray-500 text-white w-32" /*onClick={newCreate}*/>更新</Button>
+                            <Button className="bg-gray-500 text-white w-32" onClick={newCreate}>更新</Button>
                         </div>
                     </div>
                 </div>

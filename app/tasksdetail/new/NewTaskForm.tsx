@@ -14,6 +14,7 @@ import { fetchCutomers } from "@/lib/db/customer";
 import { fetchInquirySource } from "@/lib/db/inquirySource";
 import { fetchStatus } from "@/lib/db/status";
 import { fetchUsers } from "@/lib/db/users";
+import { unwatchFile } from "fs";
 
 
 
@@ -28,6 +29,7 @@ export function NewTaskForm() {
     const [categories, setCategories] = useState<{ category_id: string; category_name: string }[]>([]);
     const [users, setUsers] = useState<{ user_id: string; user_name: string , e_mail:string}[]>([]);
 
+    const [uniqueid, setUniqueId] = useState("");
     const [customer, setCustomer] = useState("");
     const [inquirySource, setinquirySource] = useState("");
     const [callDate, setcallDate ] = useState<Date | undefined>(undefined);
@@ -48,6 +50,7 @@ export function NewTaskForm() {
             return;
         }
           const bodyData = {
+                uniqueid,
                 customer,
                 inquirySource,
                 callDate: callDate ? callDate.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo",year: "numeric",month: "2-digit",day: "2-digit",hour: "2-digit",minute: "2-digit",hour12: false, }) : null,

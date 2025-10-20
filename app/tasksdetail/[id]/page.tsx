@@ -7,6 +7,30 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@radix-ui/react-label";
 import Comments from "@/components/ui/comments";
 
+//表示時の日付フォーマット
+const formatDateTime1 = (date?: Date | string | null): string => {
+  if (!date) return "";
+  const d = typeof date === "string" ? new Date(date) : date;
+  if (isNaN(d.getTime())) return "";
+  return `${d.getFullYear()}/${
+    String(d.getMonth() + 1).padStart(2, "0")
+  }/${String(d.getDate()).padStart(2, "0")} ${
+    String(d.getHours()).padStart(2, "0")
+  }:${String(d.getMinutes()).padStart(2, "0")}:${String(
+    d.getSeconds()
+  ).padStart(2, "0")}`;
+};
+const formatDateTime2 = (date?: Date | string | null): string => {
+  if (!date) return "";
+  const d = typeof date === "string" ? new Date(date) : date;
+  if (isNaN(d.getTime())) return "";
+  return `${d.getFullYear()}/${
+    String(d.getMonth() + 1).padStart(2, "0")
+  }/${String(d.getDate()).padStart(2, "0")} ${
+    String(d.getHours()).padStart(2, "0")
+  }:${String(d.getMinutes()).padStart(2, "0")}`;
+};
+
 export default function ReferenceTaskPage() {
 
     const router = useRouter();
@@ -77,16 +101,16 @@ export default function ReferenceTaskPage() {
                 setUniqueId(result.uniqueid);
                 setNo(result.no);
                 setAssignUser({assign_user_id:result.assign_user_id, assign_user_name:result.assign_user});
-                setCustomer({customer_id:result.customer_id, customer_name:result.customers});
+                setCustomer({customer_id:result.customer_id, customer_name:result.customer_name});
                 setinquirySource({inquiry_source_id:result.inquiry_source_id, inquiry_source_name:result.inquiry_source});
-                setcallDate(result.call_datetime);
+                setcallDate(result.call_datetime ? new Date(result.call_datetime) : undefined);
                 setCategory({category_id:result.category, category_name:result.category});
-                setcreatedDate(result.created_at);
-                setupdatedDate(result.updated_at);
+                setcreatedDate(result.created_at ? new Date(result.created_at) : undefined);
+                setupdatedDate(result.updated_at ? new Date(result.updated_at) : undefined);
                 setImportant(result.important);
                 setInquiryTitle(result.inquiry_title);
                 setInquiryDetail(result.inquiry_detail);
-                setRemindDate(result.remind_at);
+                setRemindDate(result.remind_at ? new Date(result.remind_at) : undefined);
                 setStatus({status_id:result.status_id, status_name:result.status});
                 setSendMail({send_mail_user_name:result.send_mail_user_name})
                 
@@ -132,11 +156,11 @@ export default function ReferenceTaskPage() {
                         </div>
                         <div className="flex items-center gap-2">
                             <p className="text-sm font-medium mr-2">作成日時</p>
-                            <p className="w-64 h-10 border mr-10 rounded-md flex items-center pl-3">{createdDate ? createdDate.toLocaleString() : ""}</p>
+                            <p className="w-64 h-10 border mr-10 rounded-md flex items-center pl-3">{formatDateTime1(createdDate)}</p>
                         </div>
                         <div className="flex items-center gap-2">
                             <p className="text-sm font-medium mr-2">更新日時</p>
-                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{updatedDate ? updatedDate.toLocaleString() : ""}</p>
+                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{formatDateTime1(updatedDate)}</p>
                         </div>
                     </div>
                     <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
@@ -150,7 +174,7 @@ export default function ReferenceTaskPage() {
                         </div>
                         <div className="flex items-center gap-2">
                             <p className="text-sm font-medium mr-2">入電日時</p>
-                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{callDate ? callDate.toLocaleString() : ""}</p>
+                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{formatDateTime2(callDate)}</p>
                         </div>
                     </div>
                     <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
@@ -176,13 +200,13 @@ export default function ReferenceTaskPage() {
                     <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
                         <div className="flex items-center gap-2">
                             <p className="text-sm font-medium mr-2">問合せ詳細</p>
-                            <p className="w-[950px] h-[250px] border mr-6 rounded-md pl-3">{inquiryDetail}</p>
+                            <p className="w-[950px] h-[250px] border mr-6 rounded-md pl-3 whitespace-pre-wrap overflow-y-auto">{inquiryDetail}</p>
                         </div>
                     </div>
                     <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
                         <div className="flex items-center gap-2">
                             <p className="text-sm font-medium mr-2">期日</p>
-                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{remindDate ? remindDate.toLocaleString() : ""}</p>
+                            <p className="w-64 h-10 border mr-6 rounded-md flex items-center pl-3">{formatDateTime2(remindDate)}</p>
                         </div>
                         <div className="flex items-center gap-2">
                             <p className="text-sm font-medium mr-2">担当者</p>

@@ -126,7 +126,7 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
             .from("tasks")
             .update({
                 is_deleted: 1,
-                deleted_at: new Date().toISOString()
+                deleted_at: new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }),
             })
             .eq("uniqueid", id)
 
