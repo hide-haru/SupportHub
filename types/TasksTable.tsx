@@ -1,7 +1,7 @@
 export type TaskType = {
     uniqueid: string;
     no: number;
-    important: number;
+    important: string;
     status: number;
     category: number;
     call_datetime: string;
