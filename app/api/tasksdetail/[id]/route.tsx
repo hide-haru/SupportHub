@@ -69,9 +69,9 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
 //タスク詳細の更新
 // ----------------------------------------
 
-export async function PUT(req: NextRequest, context: { params: { id: string } }) {
+export async function PUT(req: NextRequest, context: any) {
   try {
-    const id = context.params.id;
+    const { id } = context.params;
     const bodyData = await req.json();
 
     console.log("サーバに送信されたデータ：", id);
