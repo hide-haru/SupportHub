@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
-import { sendTaskNewEmail } from "@/lib/nodemailer";
+import { sendTaskEditEmail } from "@/lib/nodemailer";
 
 // ----------------------------------------
 //タスク詳細の取得
@@ -68,52 +68,71 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
 // ----------------------------------------
 //タスク詳細の更新
 // ----------------------------------------
-export async function PUT(req: NextRequest, context: { params: Promise<{ id: string }>}) {
-    try{
-            const data = await req.json();
-            console.log(data);
-            
-            /*
-            const {data: insertData, error: insertError} = await supabase
-                .from("tasks")
-                .update([{
-                    customer_id: data.customer,
-                    inquiry_source: data.inquirySource,
-                    call_datetime: data.callDate,
-                    important: data.important,
-                    status_id: data.status,
-                    category_id: data.category,
-                    inquiry_title: data.inquiryTitle,
-                    inquiry_detail: data.inquiryDetail,
-                    remind_at: data.remindDate,
-                    assign_id: data.assignUser,
-                    send_mail: data.sendMail,
-                    updated_at: new Date().toISOString(),
-                    is_deleted: 0
-                }])
-                .select("*");
-    
-                if (insertError) {
-                    console.error("Supabase error:", insertError);
-                    return NextResponse.json(
-                        { message: "データベース登録に失敗しました。" },
-                        { status: 500 }
-                    );
-                }
-            
-            console.log(data);
-    
-            // 登録されたUUIDを取得
-            const insertedId = insertData?.[0]?.uniqueid;
-            console.log("登録されたUUID:", insertedId);
-            await sendTaskNewEmail(data.sendMail, insertedId, data.inquiryTitle, data.inquiryDetail);
-            return NextResponse.json({message: "データ修正成功"})
-            */
-    }catch(err){
-        return NextResponse.json({error: "データ修正失敗"},{status:500});
-    }
-}
 
+export async function PUT(req: NextRequest, context: { params: { id: string } }) {
+  try {
+    const { params } = await context; // await して params を取得
+    const { id } = params;
+    const bodyData = await req.json();
+
+    console.log("サーバに送信されたデータ：", id);
+    console.log("サーバに送信されたデータ：", bodyData);
+
+    const {
+      customer,
+      inquirySource,
+      callDate,
+      important,
+      status,
+      category,
+      inquiryTitle,
+      inquiryDetail,
+      remindDate,
+      assignUser,
+      sendMail,
+    } = bodyData;
+
+    const { data: updateData, error: updateError } = await supabase
+      .from("tasks")
+      .update({
+            customer_id: bodyData.customer?.customer_id || null,
+            inquiry_source: bodyData.inquirySource?.inquiry_source_id || null,
+            call_datetime: callDate ? new Date(bodyData.callDate).toISOString() : null,
+            important: bodyData.important,
+            status_id: bodyData.status?.status_id || null,
+            category_id: bodyData.category?.category_id || null,
+            inquiry_title: bodyData.inquiryTitle,
+            inquiry_detail: bodyData.inquiryDetail,
+            remind_at: remindDate ? new Date(bodyData.remindDate).toISOString() : null,
+            assign_id: bodyData.assignUser?.assign_user_id || null,
+            send_mail: bodyData.sendMail?.send_mail || null,
+            updated_at: new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }),
+            is_deleted: 0
+      })
+      .eq("uniqueid", id);
+
+    if (updateError) {
+      console.error("Supabase error:", updateError);
+      return NextResponse.json(
+        { message: "データベース登録に失敗しました。" },
+        { status: 500 }
+      );
+    }
+
+    // 登録されたUUIDを取得
+    const insertedId = id;
+    console.log("登録されたUUID:", insertedId);
+
+   if(bodyData.sendMail?.send_mail){
+      await sendTaskEditEmail(bodyData.sendMail?.send_mail, insertedId, bodyData.inquiryTitle, bodyData.inquiryDetail);
+    }
+
+    return NextResponse.json({ message: "データ修正成功" });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ message: "データ修正失敗" }, { status: 500 });
+  }
+}
 
 
 // ----------------------------------------

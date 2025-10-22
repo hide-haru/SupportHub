@@ -24,42 +24,55 @@ export const TasksFilter = ({ filters, setFilters, masterData, onSearch }: any) 
 
   return (
     <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
-      {/* 対象日付 */}
-      <div className="flex items-center gap-2">
-        <Label className="text-sm font-medium">対象日付</Label>
-        <Select value={filters.searchDate} onValueChange={(v) => setFilters((f:any)=>({...f, searchDate:v}))}>
-          <SelectTrigger className="w-36 border">
-            <SelectValue placeholder="対象選択" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="1">入電日時</SelectItem>
-            <SelectItem value="2">対応期日</SelectItem>
-            <SelectItem value="3">作成日時</SelectItem>
-            <SelectItem value="4">更新日時</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      {/* 対象日付＋期間（セット） */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-4 p-1 border rounded-xl bg-gray-50">
+          {/* 対象日付選択 */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-black font-bold">検索対象日</span>
+            <Select
+              value={filters.searchDate}
+              onValueChange={(v) =>
+                setFilters((f: any) => ({ ...f, searchDate: v }))
+              }
+            >
+              <SelectTrigger className="w-36 border">
+                <SelectValue placeholder="対象選択" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">入電日時</SelectItem>
+                <SelectItem value="2">対応期日</SelectItem>
+                <SelectItem value="3">作成日時</SelectItem>
+                <SelectItem value="4">更新日時</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-      {/* 期間 */}
-      <div className="flex items-center gap-2">
-        <Label className="text-sm font-medium">期間</Label>
-        <Input
-          type="date"
-          value={filters.dateFrom}
-          onChange={(e) => setFilters((f:any)=>({...f, dateFrom:e.target.value}))}
-          className="w-36"
-        />
-        <span>〜</span>
-        <Input
-          type="date"
-          value={filters.dateTo}
-          onChange={(e) => setFilters((f:any)=>({...f, dateTo:e.target.value}))}
-          className="w-36"
-        />
+          {/* 期間選択 */}
+          <div className="flex items-center gap-2">
+            <Input
+              type="date"
+              value={filters.dateFrom}
+              onChange={(e) =>
+                setFilters((f: any) => ({ ...f, dateFrom: e.target.value }))
+              }
+              className="w-36"
+            />
+            <span>〜</span>
+            <Input
+              type="date"
+              value={filters.dateTo}
+              onChange={(e) =>
+                setFilters((f: any) => ({ ...f, dateTo: e.target.value }))
+              }
+              className="w-36"
+            />
+          </div>
+        </div>
       </div>
 
       {/* 重要度 */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 p-1">
         <Label className="text-sm font-medium">重要度</Label>
         <Select value={filters.important} onValueChange={(v) => setFilters((f:any)=>({...f, important:v}))}>
           <SelectTrigger className="w-36 border">
@@ -74,7 +87,7 @@ export const TasksFilter = ({ filters, setFilters, masterData, onSearch }: any) 
       </div>
 
       {/* ステータス */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 p-1">
         <Label className="text-sm font-medium">ステータス</Label>
         <Select value={filters.status} onValueChange={(v) => setFilters((f:any)=>({...f, status:v}))}>
           <SelectTrigger className="w-36 border">
@@ -89,7 +102,7 @@ export const TasksFilter = ({ filters, setFilters, masterData, onSearch }: any) 
       </div>
 
       {/* カテゴリ */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 p-1">
         <Label className="text-sm font-medium">カテゴリ</Label>
         <Select value={filters.category} onValueChange={(v) => setFilters((f:any)=>({...f, category:v}))}>
           <SelectTrigger className="w-36 border">
@@ -104,7 +117,7 @@ export const TasksFilter = ({ filters, setFilters, masterData, onSearch }: any) 
       </div>
 
       {/* 顧客名 */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 p-1">
         <Label className="text-sm font-medium">顧客名</Label>
         <Select value={filters.customer} onValueChange={(v) => setFilters((f:any)=>({...f, customer:v}))}>
           <SelectTrigger className="w-36 border">
@@ -119,7 +132,7 @@ export const TasksFilter = ({ filters, setFilters, masterData, onSearch }: any) 
       </div>
 
       {/* ボタン */}
-      <div className="ml-auto flex gap-2">
+      <div className="ml-auto flex gap-2 p-1">
         <Button variant="outline" onClick={resetFilters}>リセット</Button>
         <Button className="bg-blue-600 text-white" onClick={onSearch}>検索</Button>
       </div>

@@ -24,20 +24,42 @@ export async function sendVerificationEmail(to: string, token: string) {
   });
 }
 
+
+
 export async function sendTaskNewEmail(to:string, id:string, inquiry_title:string, inquiry_detail:string) {
   const url = `${process.env.BASE_URL}/tasksdetail/${id}`;
 
   await transporter.sendMail({
     from: `"SupportHub" <${process.env.SMTP_USER}>`,
     to,
-    subject: `SupportHub[問合せ(新規)]${inquiry_title}`,
+    subject: `SupportHub[問合せ(新規)]：${inquiry_title}`,
     html: `
       <p>新規のお問い合わせが ${to} 宛てにありました。</p>
       <p>リンク先：<a href="${url}">${url}</a></p>
       <p>【問合せ概要】</p>
       <p>${inquiry_title}</p>
       <p>【問合せ詳細】</p>
-      <p>${inquiry_detail}</p>
+      <p>${inquiry_detail.replace(/\r?\n/g, "<br>")}</p>
+    `,
+  });
+}
+
+
+
+export async function sendTaskEditEmail(to:string, id:string, inquiry_title:string, inquiry_detail:string) {
+  const url = `${process.env.BASE_URL}/tasksdetail/${id}`;
+
+  await transporter.sendMail({
+    from: `"SupportHub" <${process.env.SMTP_USER}>`,
+    to,
+    subject: `SupportHub[問合せ(更新)]：${inquiry_title}`,
+    html: `
+      <p>更新のお問い合わせが ${to} 宛てにありました。</p>
+      <p>リンク先：<a href="${url}">${url}</a></p>
+      <p>【問合せ概要】</p>
+      <p>${inquiry_title}</p>
+      <p>【問合せ詳細】</p>
+      <p>${inquiry_detail.replace(/\r?\n/g, "<br>")}</p>
     `,
   });
 }

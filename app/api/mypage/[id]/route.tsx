@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 
 //------------------------------------
-//既存ユーザ情報の取得
+//マイページ情報の取得
 //------------------------------------
 export async function GET(req: NextRequest, context: { params: Promise<{ id: string }>} ) {
     try{
@@ -44,42 +44,61 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
 }
 
 
-
 //------------------------------------
-//マイページのアップデート
+// マイページのアップデート
 //------------------------------------
-export async function PUT(request:Request){
-    try{
-        const { id, userName, userId, eMail, password } = await request.json();
 
-        console.log("profilesテーブルの更新に入る。")
-        //profilesテーブル情報の変更
-        const { data: updateData, error:updateError} = await supabase.rpc("update_user_and_tasks",{
-            target_auth_id: id,
-            new_user_id: userId,
-            new_user_name: userName,
-            new_email: eMail,
-        });
-            
+export async function PUT(request: Request) {
+  try {
+    const { id, userName, userId, eMail } = await request.json()
+    console.log("PUTの開始　data:", "id:",id, "userName",userName, "userId",userId, "eMail",eMail)
 
-        if (updateError) {
-            console.error("Supabase error:", updateError);
-            return NextResponse.json(
-                { message: "データベース登録に失敗しました。" },
-                { status: 500 }
-            );
-        }
+    // --- ユーザID重複チェック ---
+    const { data: checkUserData, error: checkError } = await supabase
+      .from("profiles")
+      .select("auth_id")
+      .eq("user_id", Number(userId))
+      .neq("auth_id", id)
 
-        //auth.useresテーブル情報の変更
-        const { data, error } = await supabaseAdmin.auth.admin.updateUserById(id, {
-             email: eMail,
-             password: password,
-        });
 
-        
-
-        return NextResponse.json({message: "ユーザ情報の変更に成功しました。"});
-    }catch(err){
-        return NextResponse.json({error: "登録失敗"},{status:500});
+    if (checkError) {
+      console.error("UserID check error:", checkError)
+      return NextResponse.json({ success: false, message: "ユーザ確認中にエラーが発生しました。" }, { status: 500 })
     }
+    console.log("checkUserData",checkUserData)
+    if (checkUserData && checkUserData.length > 0) {
+      return NextResponse.json({ success: false, message: "ユーザIDが既に存在します。" })
+    }
+
+    // --- profiles テーブル更新（RPC呼び出し） ---
+    const { data: updateData, error: updateError } = await supabase.rpc("update_user_and_tasks", {
+        target_auth_id: id,
+        new_user_id: userId,
+        new_user_name: userName,
+        new_email: eMail,
+    })
+
+    if (updateError || !updateData) {
+      console.error("Supabase RPC error:", updateError)
+      return NextResponse.json({ success: false, message: "データベース登録に失敗しました。" }, { status: 500 })
+    }
+
+    // --- 認証情報(auth.users)の更新 ---
+    if (eMail) {
+      const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(id, {
+        ...(eMail ? { email: eMail } : {}),
+      })
+
+
+      if (authError) {
+        console.error("Auth update error:", authError)
+        return NextResponse.json({ success: false, message: "認証情報の更新に失敗しました。" }, { status: 500 })
+      }
+    }
+
+    return NextResponse.json({ success: true, message: "ユーザ情報の変更に成功しました。" })
+  } catch (err) {
+    console.error("PUT /mypage error:", err)
+    return NextResponse.json({ success: false, message: "登録処理中にエラーが発生しました。" }, { status: 500 })
+  }
 }

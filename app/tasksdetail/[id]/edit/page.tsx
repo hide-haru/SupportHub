@@ -14,6 +14,7 @@ import { fetchCutomers } from "@/lib/db/customer";
 import { fetchInquirySource } from "@/lib/db/inquirySource";
 import { fetchStatus } from "@/lib/db/status";
 import { fetchUsers } from "@/lib/db/users";
+import { unique } from "next/dist/build/utils";
 
 
 
@@ -45,23 +46,43 @@ export default function TasksNewdetail() {
 
     const params = useParams();
         const { id } = params;
+        //setUniqueId(id);
 
 
-    const newCreate = async () => {
-        const bodyData = {
-        customer,
-        inquirySource,
-        callDate: callDate ? callDate.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo",year: "numeric",month: "2-digit",day: "2-digit",hour: "2-digit",minute: "2-digit",hour12: false, }) : null,
-        important,
-        status,
-        category,
-        inquiryTitle,
-        inquiryDetail,
-        remindDate: remindDate ? remindDate.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo",year: "numeric",month: "2-digit",day: "2-digit",hour: "2-digit",minute: "2-digit",hour12: false, }) : null,
-        assignUser,
-        sendMail,
+    const editCreate = async () => {
+
+        try{
+            console.log("unique",id);
+            const bodyData = {
+                uniquId,
+                customer,
+                inquirySource,
+                callDate: callDate ? callDate.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo",year: "numeric",month: "2-digit",day: "2-digit",hour: "2-digit",minute: "2-digit",hour12: false, }) : null,
+                important,
+                status,
+                category,
+                inquiryTitle,
+                inquiryDetail,
+                remindDate: remindDate ? remindDate.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo",year: "numeric",month: "2-digit",day: "2-digit",hour: "2-digit",minute: "2-digit",hour12: false, }) : null,
+                assignUser,
+                sendMail,
             };
-        console.log(bodyData);
+
+            console.log(bodyData);
+
+            const response = await fetch(`/api/tasksdetail/${id}`,{
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(bodyData),
+            });
+
+            const result = await response.json();
+            alert(result.message);
+            router.push("/tasks")
+        }catch(err){
+            console.log(err);
+            console.log("サーバとの通信に失敗しました。再度、更新をお願いします。")
+        }
     }
 
     //マスタ類API（Status / Category / Customers）の呼び出し
@@ -316,7 +337,7 @@ export default function TasksNewdetail() {
                     <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
                         {/* ボタン類 */}
                         <div className="ml-auto flex gap-2">
-                            <Button className="bg-gray-500 text-white w-32" onClick={newCreate}>更新</Button>
+                            <Button className="bg-gray-400 text-white w-32" onClick={editCreate}>更新</Button>
                         </div>
                     </div>
                 </div>

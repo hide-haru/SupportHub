@@ -13,6 +13,8 @@ export const TasksNav = ({ userId }: { userId: string | null }) => (
     <p>／</p>
     <Link href={`/mypage/${userId}`}>マイページ</Link>
     <p>／</p>
+    <Link href={`/repassword/${userId}`}>パスワード変更</Link>
+    <p>／</p>
     <Link href="/logout">ログアウト</Link>
   </nav>
 );

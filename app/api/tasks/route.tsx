@@ -14,7 +14,7 @@ export async function GET(request: Request) {
         const status = searchParams.get("status");
         const category = searchParams.get("category");
         const customer = searchParams.get("customer");
-        //console.log("受け取った検索条件:", { searchDate,dateFrom, dateTo, important, status, category, customer });
+        console.log("受け取った検索条件:", { searchDate,dateFrom, dateTo, important, status, category, customer });
 
         // 日付対象カラム
         if (searchDate === "1") targetDate = ["call_datetime"];
@@ -51,15 +51,15 @@ export async function GET(request: Request) {
         if (dateFrom && dateTo && targetDate.length > 0) {
             if (targetDate.length > 1) {
                 const orFilter = targetDate
-                    .map(col => `(${col}.gte.${dateFrom}AND${col}.lte.${dateTo})`)
-                    .join(','); // OR 条件として結合
-                query = query.or(orFilter);
+                    .map((col) =>`and(${col}.gte.${dateFrom}T00:00:00,${col}.lte.${dateTo}T23:59:59)`)
+                    .join(",");
+                    query = query.or(orFilter);
             } else {
-                query = query.gte(targetDate[0], dateFrom).lte(targetDate[0], dateTo);
+                query = query.gte(targetDate[0], `${dateFrom}T00:00:00`).lte(targetDate[0], `${dateTo}T23:59:59`);
             }
         }
 
-        //console.log(query);
+        console.log(query);
         const { data: selectData, error: selectError } = await query;
         
 
@@ -94,7 +94,7 @@ export async function GET(request: Request) {
             updated_at: task.updated_at,
         })) ?? [];
 
-        console.log("検索結果:", flatData);
+        //console.log("検索結果:", flatData);
         return NextResponse.json(flatData);
 
     }catch(err){

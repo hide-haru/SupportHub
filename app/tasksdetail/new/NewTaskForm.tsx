@@ -14,7 +14,6 @@ import { fetchCutomers } from "@/lib/db/customer";
 import { fetchInquirySource } from "@/lib/db/inquirySource";
 import { fetchStatus } from "@/lib/db/status";
 import { fetchUsers } from "@/lib/db/users";
-import { unwatchFile } from "fs";
 
 
 
@@ -45,12 +44,11 @@ export function NewTaskForm() {
     const newCreate = async() => {
 
         //requiredチェック
-        if(!customer || !status || !category || !inquiryTitle || !inquiryDetail){
+        if(!customer || !status || !category || !inquiryTitle || !inquiryDetail || !assignUser){
             alert("必須項目が入力されていません。")
             return;
         }
           const bodyData = {
-                uniqueid,
                 customer,
                 inquirySource,
                 callDate: callDate ? callDate.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo",year: "numeric",month: "2-digit",day: "2-digit",hour: "2-digit",minute: "2-digit",hour12: false, }) : null,
@@ -76,7 +74,6 @@ export function NewTaskForm() {
             console.log(result);
             router.push('/tasks');
         }catch(err){
-            console.log("bbb")
             console.log(err);
             console.log("サーバとの通信に失敗しました。再度、新規登録をお願いします。")
         }
@@ -291,7 +288,7 @@ export function NewTaskForm() {
                 <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
                     {/* ボタン類 */}
                     <div className="ml-auto flex gap-2">
-                        <Button className="bg-gray-500 text-white w-32" onClick={newCreate}>作成</Button>
+                        <Button className="bg-gray-400 text-white w-32" onClick={newCreate}>作成</Button>
                     </div>
                 </div>
             </div>

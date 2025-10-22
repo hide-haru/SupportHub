@@ -6,9 +6,27 @@ import { sendResetEmail } from "@/lib/auth/sendResetEmail";
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setMessage("");
+    setError("");
+
+    // --- ① メール存在チェック ---
+    const checkRes = await fetch("/api/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    const { exists } = await checkRes.json();
+
+    if (!exists) {
+      setError("このメールアドレスは登録されていません。");
+      return;
+    }
+
     const res = await sendResetEmail(email);
     setMessage(res ? "パスワードリセット用のメールを送信しました" : "メール送信に失敗しました");
   };
@@ -42,6 +60,9 @@ export default function ForgotPasswordPage() {
           </form>
           {message && (
             <p className="mt-4 text-center text-sm text-green-600">{message}</p>
+          )}
+          {error && (
+            <p className="mt-4 text-center text-sm text-red-600">{error}</p>
           )}
         </div>
       </div>
