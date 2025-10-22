@@ -70,7 +70,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
 // ----------------------------------------
 
 export async function PUT(req: NextRequest, context: any) {
-  try {
+  //try {
     const { id } = context.params;
     const bodyData = await req.json();
 
@@ -127,11 +127,11 @@ export async function PUT(req: NextRequest, context: any) {
     }
 
     return NextResponse.json({ message: "データ修正成功" });
-  } catch (err) {
+  }/* catch (err) {
     console.error(err);
     return NextResponse.json({ message: "データ修正失敗" }, { status: 500 });
-  }
-}
+  }*/
+//}
 
 
 // ----------------------------------------
