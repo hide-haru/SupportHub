@@ -13,14 +13,28 @@ export default function VerifyPage() {
   const token = params.get("token");
 
   useEffect(() => {
-    if (token) {
-      fetch(`http://localhost:3000/api/auth/verify?token=${token}`)
-        .then(res => res.json())
-        .then(data => alert(data.message));
-        window.location.href = "/tasks";
-    }
-  }, [token]);
+    const verifyEmail = async () => {
+      if (!token) return;
 
-  return <div className="flex items-center justify-center min-h-screen">メール認証中…</div>;
-  
+      try {
+        const res = await fetch(`/api/auth/verify?token=${token}`);
+        const data = await res.json();
+        alert(data.message);
+
+        // ✅ window.location.href の代わりに router.push()
+        router.push("/tasks");
+      } catch (err) {
+        console.error("メール認証エラー:", err);
+        alert("認証に失敗しました。再度お試しください。");
+      }
+    };
+
+    verifyEmail();
+  }, [token, router]);
+
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      メール認証中…
+    </div>
+  );
 }

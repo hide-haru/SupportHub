@@ -63,7 +63,7 @@ export function NewTaskForm() {
             };
 
         try{
-            const response = await fetch("http://localhost:3000/api/tasksdetail",{
+            const response = await fetch("/api/tasksdetail",{
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

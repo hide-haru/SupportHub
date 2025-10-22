@@ -98,7 +98,7 @@ export default function ReferenceTaskPage() {
   useEffect(() => {
     const fetchTask = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/tasksdetail/${id}`, {
+        const response = await fetch(`/api/tasksdetail/${id}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
