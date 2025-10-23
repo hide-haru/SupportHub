@@ -29,8 +29,15 @@ export async function handleLogin(userId: string, password: string): Promise<boo
       return false;
     }
 
-    alert("ログインに成功しました。");
-    return true;
+    // ✅ サインイン成功時、セッションを保持
+    if (data.session) {
+      await supabase.auth.setSession(data.session);
+      console.log("ログイン成功。セッション保持完了。");
+      return true;
+    } else {
+      console.error("セッションが取得できませんでした");
+      return false;
+    }
   } catch (err) {
     console.error("通信エラー:", err);
     alert("サーバとの通信に失敗しました。");

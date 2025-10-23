@@ -3,8 +3,10 @@
 import Link from "next/link";
 import '../styles/loginform.css';
 import { handleLogin } from "@/lib/auth/login";
+import { useRouter } from "next/navigation";
 
 export function LoginForm() {
+  const router = useRouter();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -13,7 +15,8 @@ export function LoginForm() {
 
     const success = await handleLogin(userId, password);
     if (success) {
-      window.location.href = "/tasks";
+      //window.location.href = "/tasks";
+      router.push("/tasks");
     }
   };
 
