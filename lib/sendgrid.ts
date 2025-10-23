@@ -9,10 +9,10 @@ export async function sendVerificationEmail(to: string, token: string) {
   const url = `${process.env.BASE_URL}/verify?token=${token}`;
 
   await sgMail.send({
-    to,
+    to: to || process.env.SUPPORTHUB_TO!,
     from: {
-      email: "hideharusawada9@gmail.com",
-      name: "SupportHub",
+      email: process.env.SUPPORTHUB_FROM!,
+      name: process.env.SUPPORTHUB_FROM_NAME!,
     },
     subject: "メール認証のお願い",
     html: `
@@ -34,10 +34,10 @@ export async function sendTaskNewEmail(
   const url = `${process.env.BASE_URL}/tasksdetail/${id}`;
 
   await sgMail.send({
-    to,
+    to: to || process.env.SUPPORTHUB_TO!,
     from: {
-      email: "hideharusawada9@gmail.com",
-      name: "SupportHub",
+      email: process.env.SUPPORTHUB_FROM!,
+      name: process.env.SUPPORTHUB_FROM_NAME!,
     },
     subject: `SupportHub[問合せ(新規)]：${inquiry_title}`,
     html: `
@@ -63,10 +63,10 @@ export async function sendTaskEditEmail(
   const url = `${process.env.BASE_URL}/tasksdetail/${id}`;
 
   await sgMail.send({
-    to,
+    to: to || process.env.SUPPORTHUB_TO!,
     from: {
-      email: "hideharusawada9@gmail.com",
-      name: "SupportHub",
+      email: process.env.SUPPORTHUB_FROM!,
+      name: process.env.SUPPORTHUB_FROM_NAME!,
     },
     subject: `SupportHub[問合せ(更新)]：${inquiry_title}`,
     html: `
