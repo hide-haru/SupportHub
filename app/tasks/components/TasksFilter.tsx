@@ -11,7 +11,7 @@ import { useTasks } from "../hooks/useTasks";
 export const TasksFilter = ({ filters, setFilters, masterData, onSearch }: any) => {
 
   const resetFilters = () => {
-      setFilters({
+    const cleared = {
       searchDate: "",
       dateFrom: "",
       dateTo: "",
@@ -19,8 +19,10 @@ export const TasksFilter = ({ filters, setFilters, masterData, onSearch }: any) 
       status: "",
       category: "",
       customer: "",
-      });
-  }
+    };
+    setFilters(cleared);
+    onSearch(cleared); // ✅ 全件再取得
+  };
 
   return (
     <div className="bg-white p-3 rounded-xl flex flex-wrap items-start gap-6">
@@ -134,7 +136,7 @@ export const TasksFilter = ({ filters, setFilters, masterData, onSearch }: any) 
       {/* ボタン */}
       <div className="ml-auto flex gap-2 p-1">
         <Button variant="outline" onClick={resetFilters}>リセット</Button>
-        <Button className="bg-blue-600 text-white" onClick={onSearch}>検索</Button>
+        <Button className="bg-blue-600 text-white" onClick={() => onSearch(filters)}>検索</Button>
       </div>
     </div>
   );

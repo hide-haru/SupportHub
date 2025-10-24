@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import '../styles/loginform.css';
+import "./layout.css"
 import { handleLogin } from "@/lib/auth/login";
 import { useRouter } from "next/navigation";
 

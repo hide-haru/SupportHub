@@ -23,28 +23,33 @@ export const useTasks = () => {
     customers: [] as any[],
   });
 
-  const fetchAllData = async () => {
+  //------------------------------------------
+  // ✅ fetchAllData(filters)
+  //------------------------------------------
+  const fetchAllData = useCallback(async (targetFilters?: typeof filters) => {
     setIsLoading(true);
     try {
-      // マスタ取得
+      // マスタ取得（※一度だけ取得したいなら別関数に切り出して useEffect 初回で実行）
       const [statusRes, categoryRes, customerRes] = await Promise.all([
         fetchStatus(),
         fetchCategory(),
         fetchCutomers(),
       ]);
+
       const [statusJson, categoryJson, customerJson] = await Promise.all([
         statusRes.json(),
         categoryRes.json(),
         customerRes.json(),
       ]);
+
       setMasterData({
         statuses: statusJson.data || [],
         categories: categoryJson.data || [],
         customers: customerJson.data || [],
       });
 
-      // タスク検索
-      const params = new URLSearchParams(filters as any);
+      // ✅ 最新filtersを使用して検索
+      const params = new URLSearchParams((targetFilters ?? filters) as any);
       const response = await fetch(`/api/tasks?${params.toString()}`);
       const result = await response.json();
       setTasksData(Array.isArray(result) ? result : []);
@@ -53,7 +58,7 @@ export const useTasks = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []); // ← filters依存はOK。ただし fetchAllData を直接 useEffect で呼ばない
 
   return { isLoading, tasksData, fetchAllData, filters, setFilters, masterData };
 };

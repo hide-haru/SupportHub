@@ -1,7 +1,7 @@
 "use strict";
 "use client";
 
-import '../styles/loginform.css';
+import "./layout.css"
 import { LoginForm } from "./LoginForm";
 
 
