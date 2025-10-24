@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabaseClient";
 import { NextResponse } from "next/server";
-import { sendTaskNewEmail } from "@/lib/nodemailer";
+import { sendTaskNewEmail } from "@/lib/sendgrid";
 
 // ----------------------------------------
 // タスク詳細の作成
