@@ -1,15 +1,13 @@
-"use strict";
 "use client";
+"use strict";
 
+import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { useTasks } from "../hooks/useTasks";
 
-export const TasksFilter = ({ filters, setFilters, masterData, onSearch }: any) => {
-
+const TasksFilterComponent = ({ filters, setFilters, masterData, onSearch }: any) => {
   const resetFilters = () => {
     const cleared = {
       searchDate: "",
@@ -21,7 +19,7 @@ export const TasksFilter = ({ filters, setFilters, masterData, onSearch }: any) 
       customer: "",
     };
     setFilters(cleared);
-    onSearch(cleared); // ✅ 全件再取得
+    onSearch(cleared); // 全件再取得
   };
 
   return (
@@ -141,3 +139,6 @@ export const TasksFilter = ({ filters, setFilters, masterData, onSearch }: any) 
     </div>
   );
 };
+
+
+export const TasksFilter = React.memo(TasksFilterComponent);

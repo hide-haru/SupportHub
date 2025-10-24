@@ -16,7 +16,7 @@ export default function TasksPage() {
   const { isLoading, tasksData, fetchAllData, filters, setFilters, masterData } = useTasks();
 
   //------------------------------------------
-  // ✅ 初回表示：ログイン確認 & 全件取得
+  // 初回表示：ログイン確認 & 全件取得
   //------------------------------------------
   useEffect(() => {
     const init = async () => {
@@ -30,37 +30,36 @@ export default function TasksPage() {
       }
       setSession(data.session);
 
-      // 初期ロード時に全件取得
+      //初期ロードで全件取得
       await fetchAllData();
     };
 
     init();
 
-    // ✅ 認証状態監視（ログアウト時など）
+    //認証状態監視（ログアウト時など）
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       if (!session) router.replace("/login");
-      else await fetchAllData();
     });
 
     return () => subscription.unsubscribe();
   }, [router]);
 
   //------------------------------------------
-  // ✅ リサイズ時も再取得
+  //リサイズ時の再取得
   //------------------------------------------
   useEffect(() => {
-    const handleResize = () => fetchAllData();
+    const handleResize = () => fetchAllData(filters);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [fetchAllData]);
+  }, [fetchAllData, filters]);
 
   //------------------------------------------
-  // ✅ ローディング中表示
+  // ローディング中
   //------------------------------------------
-  if (isLoading) return <p className="p-6 text-gray-500">読み込み中...</p>;
+  //if (isLoading) return <p className="p-6 text-gray-500">読み込み中...</p>;
 
   return (
     <>
@@ -69,7 +68,7 @@ export default function TasksPage() {
         filters={filters}
         setFilters={setFilters}
         masterData={masterData}
-        onSearch={fetchAllData} // ←検索ボタン押下時のみfetch実行
+        onSearch={fetchAllData}
       />
       <TasksTable data={tasksData} />
     </>

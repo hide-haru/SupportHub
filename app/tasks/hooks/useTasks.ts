@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { TaskType } from "@/types/TasksTable";
 import { fetchCategory } from "@/lib/db/category";
 import { fetchCutomers } from "@/lib/db/customer";
@@ -24,41 +24,51 @@ export const useTasks = () => {
   });
 
   //------------------------------------------
-  // ✅ fetchAllData(filters)
+  //初回のみマスタデータを取得
+  //------------------------------------------
+  useEffect(() => {
+    const fetchMasterData = async () => {
+      try {
+        const [statusRes, categoryRes, customerRes] = await Promise.all([
+          fetchStatus(),
+          fetchCategory(),
+          fetchCutomers(),
+        ]);
+        const [statusJson, categoryJson, customerJson] = await Promise.all([
+          statusRes.json(),
+          categoryRes.json(),
+          customerRes.json(),
+        ]);
+
+        setMasterData({
+          statuses: statusJson.data || [],
+          categories: categoryJson.data || [],
+          customers: customerJson.data || [],
+        });
+      } catch (err) {
+        console.error("Master fetch error:", err);
+      }
+    };
+    fetchMasterData();
+  }, []);
+
+  //------------------------------------------
+  //タスクデータ取得（filters指定可能）
   //------------------------------------------
   const fetchAllData = useCallback(async (targetFilters?: typeof filters) => {
     setIsLoading(true);
     try {
-      // マスタ取得（※一度だけ取得したいなら別関数に切り出して useEffect 初回で実行）
-      const [statusRes, categoryRes, customerRes] = await Promise.all([
-        fetchStatus(),
-        fetchCategory(),
-        fetchCutomers(),
-      ]);
-
-      const [statusJson, categoryJson, customerJson] = await Promise.all([
-        statusRes.json(),
-        categoryRes.json(),
-        customerRes.json(),
-      ]);
-
-      setMasterData({
-        statuses: statusJson.data || [],
-        categories: categoryJson.data || [],
-        customers: customerJson.data || [],
-      });
-
-      // ✅ 最新filtersを使用して検索
       const params = new URLSearchParams((targetFilters ?? filters) as any);
       const response = await fetch(`/api/tasks?${params.toString()}`);
       const result = await response.json();
       setTasksData(Array.isArray(result) ? result : []);
     } catch (err) {
-      console.error("Fetch error:", err);
+      console.error("Tasks fetch error:", err);
     } finally {
       setIsLoading(false);
     }
-  }, []); // ← filters依存はOK。ただし fetchAllData を直接 useEffect で呼ばない
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // ← filters依存なし（引数で渡す）
 
   return { isLoading, tasksData, fetchAllData, filters, setFilters, masterData };
 };
