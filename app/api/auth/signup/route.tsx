@@ -28,7 +28,7 @@ export async function POST(request: Request) {
             email: eMail,
             password: password,
             options: {
-                emailRedirectTo: `${process.env.NEXT_PUBLIC_REDIRECT_URL ? process.env.NEXT_PUBLIC_REDIRECT_URL : "https://supporthub.vercel.app"}/verify`,
+                emailRedirectTo: `${process.env.NEXT_PUBLIC_REDIRECT_URL ? process.env.NEXT_PUBLIC_REDIRECT_URL : "https://support-hub-five.vercel.app/"}/verify`,
             },
         });
 
