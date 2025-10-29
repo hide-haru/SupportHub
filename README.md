@@ -10,7 +10,7 @@ Next.jsとSupabaseを用いた、社内サポート部門向けのタスク管�
 
 
 ## サイトURL
-https://support-8pgxgv8g3-hide-harus-projects.vercel.app/
+https://support-hub-five.vercel.app/
 
 ログインページに遷移します。
 ログインフォーム右上の「新規登録はこちら」から、名前/ユーザID/メールアドレス/パスワードを入力してログインお願いします。
