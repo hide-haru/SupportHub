@@ -27,6 +27,9 @@ export async function POST(request: Request) {
         const { data, error } = await supabase.auth.signUp({
             email: eMail,
             password: password,
+            options: {
+                emailRedirectTo: process.env.NEXT_PUBLIC_REDIRECT_URL || "https://supporthub.vercel.app", // ← ここを追加！
+            },
         });
 
         if (error) {
